@@ -25,7 +25,7 @@
       <div class = "column left" style="background-color:#aaa;">
         <h1 id = "username">Username : </h1>
         <form id="form1" action="">
-          <input id="name" autocomplete="off" /><button>Send</button></form>
+          <input id="name" autocomplete="off" /><button>Confirm</button></form>
       </div>
 
 
@@ -34,6 +34,12 @@
         <form id="form" action="">
           <input id="input" autocomplete="off" /><button>Send</button>
         </form></div>
+
+        <!-- <div class = "special column">
+          <form id="form0">
+            <input id="special" autocomplete="off"/><button>Special</button>
+          </form>
+        </div> -->
     </div>
     
     <script src="/socket.io/socket.io.js"></script>
@@ -49,21 +55,22 @@
 
       form1.addEventListener('submit', (e) => {
         e.preventDefault();
-        if (input.value) {
-          username.innerHTML="Username : "+input.value;
+        if (name.value) {
+          username.innerHTML="Username : "+name.value;
           console.log("Username set.");
-          const text = "Username set to "+input.value+".";
-          socket.emit('chat message',text);
-          // socket.emit('chat message', "yooooooooooooooo");
-          input.value = '';
+          const text = "Username set to "+name.value+".";
+          socket.emit('status message',text);
+          //socket.emit('chat message', "yooooooooooooooo");
+          name.value = '';
         }
       });
 
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         if (input.value) {
+         // console.log(input.value)
           socket.emit('chat message', input.value);
-          // socket.emit('chat message', "yooooooooooooooo");
+          //socket.emit('chat message', "yooooooooooooooo");
           input.value = '';
         }
       });
@@ -75,6 +82,13 @@
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       });
+
+      socket.on('status message',(msg) => {
+        const item = document.createElement('li');
+        item.textContent = msg;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      })
     </script>
   </body>
 </html>

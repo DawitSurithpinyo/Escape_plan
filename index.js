@@ -14,11 +14,15 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
   const id = socket.id;
-  console.log(id+" has connected");
+  //const joinNoti = id + " has joined."
+  console.log(id+" is cool.");
   socket.on('chat message', (msg) => {
-    const text = id + " : " + msg
+    const text = `${id}: ${msg}`
     io.emit('chat message', (text));
   });
+  socket.on('status message',(msg) => {
+    io.emit('status message',msg);
+  })
 });
 
 server.listen(3000, () => {
