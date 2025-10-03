@@ -1,5 +1,5 @@
 {
-  "name":"great-escape",
+  "name": "great-escape",
   "description": "Net Centric Project",
   "dependencies": {
     "express": "^5.1.0",
