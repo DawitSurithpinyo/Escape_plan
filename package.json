@@ -1,0 +1,8 @@
+{
+  "name":"great-escape",
+  "description": "Net Centric Project",
+  "dependencies": {
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1"
+  }
+}
