@@ -6,6 +6,10 @@
     <style>
       body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
+      .column {float: left; padding: 10px; height:100%}
+      .left {width: 25%;}
+      .right {width: 75%;}
+      .row:after {content: "";display: table;clear: both}
       #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
       #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
       #input:focus { outline: none; }
@@ -17,22 +21,49 @@
     </style>
   </head>
   <body>
-    <ul id="messages"></ul>
-    <form id="form" action="">
-      <input id="input" autocomplete="off" /><button>Send</button>
-    </form>
+    <div class ="row">
+      <div class = "column left" style="background-color:#aaa;">
+        <h1 id = "username">Username : </h1>
+        <form id="form1" action="">
+          <input id="name" autocomplete="off" /><button>Send</button></form>
+      </div>
+
+
+      <div class = "column right">
+        <ul id="messages"></ul>
+        <form id="form" action="">
+          <input id="input" autocomplete="off" /><button>Send</button>
+        </form></div>
+    </div>
+    
     <script src="/socket.io/socket.io.js"></script>
     <script>
       const socket = io();
+      const username = document.getElementById('username');
+      const form1 = document.getElementById('form1');
+      const name = document.getElementById('name');
 
       const form = document.getElementById('form');
       const input = document.getElementById('input');
       const messages = document.getElementById('messages');
 
+      form1.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (input.value) {
+          username.innerHTML="Username : "+input.value;
+          console.log("Username set.");
+          const text = "Username set to "+input.value+".";
+          socket.emit('chat message',text);
+          // socket.emit('chat message', "yooooooooooooooo");
+          input.value = '';
+        }
+      });
+
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         if (input.value) {
           socket.emit('chat message', input.value);
+          // socket.emit('chat message', "yooooooooooooooo");
           input.value = '';
         }
       });
@@ -40,6 +71,7 @@
       socket.on('chat message', (msg) => {
         const item = document.createElement('li');
         item.textContent = msg;
+        // item.textContent = "Test";
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       });
