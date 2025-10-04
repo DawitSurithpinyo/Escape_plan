@@ -58,8 +58,7 @@
         if (name.value) {
           username.innerHTML="Username : "+name.value;
           console.log("Username set.");
-          const text = "Username set to "+name.value+".";
-          socket.emit('status message',text);
+          socket.emit('status message',name.value);
           //socket.emit('chat message', "yooooooooooooooo");
           name.value = '';
         }
@@ -86,8 +85,12 @@
       socket.on('status message',(msg) => {
         const item = document.createElement('li');
         item.textContent = msg;
+        item.style.fontWeight = "bold";
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
+      })
+      socket.on('set name',(name) => {
+        console.log(name);
       })
     </script>
   </body>
