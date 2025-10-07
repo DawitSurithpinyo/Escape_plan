@@ -3,6 +3,11 @@
   "description": "Net Centric Project",
   "dependencies": {
     "express": "^5.1.0",
+    "open": "^10.2.0",
     "socket.io": "^4.8.1"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "open": "open http://localhost:3000"
   }
 }
