@@ -10,7 +10,7 @@
       .left {width: 25%;}
       .right {width: 75%;}
       .row:after {content: "";display: table;clear: both}
-      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+      #form { background: rgba(99, 74, 74, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
       #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
       #input:focus { outline: none; }
       #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
@@ -25,7 +25,7 @@
       <div class = "column left" style="background-color:#aaa;">
         <h1 id = "username">Username : </h1>
         <form id="form1" action="">
-          <input id="name" autocomplete="off" /><button>Send</button></form>
+          <input id="name" autocomplete="off" /><button>Confirm</button></form>
       </div>
 
 
@@ -34,6 +34,12 @@
         <form id="form" action="">
           <input id="input" autocomplete="off" /><button>Send</button>
         </form></div>
+
+        <!-- <div class = "special column">
+          <form id="form0">
+            <input id="special" autocomplete="off"/><button>Special</button>
+          </form>
+        </div> -->
     </div>
     
     <script src="/socket.io/socket.io.js"></script>
@@ -49,21 +55,21 @@
 
       form1.addEventListener('submit', (e) => {
         e.preventDefault();
-        if (input.value) {
-          username.innerHTML="Username : "+input.value;
+        if (name.value) {
+          username.innerHTML="Username : "+name.value;
           console.log("Username set.");
-          const text = "Username set to "+input.value+".";
-          socket.emit('chat message',text);
-          // socket.emit('chat message', "yooooooooooooooo");
-          input.value = '';
+          socket.emit('status message',name.value);
+          //socket.emit('chat message', "yooooooooooooooo");
+          name.value = '';
         }
       });
 
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         if (input.value) {
+         // console.log(input.value)
           socket.emit('chat message', input.value);
-          // socket.emit('chat message', "yooooooooooooooo");
+          //socket.emit('chat message', "yooooooooooooooo");
           input.value = '';
         }
       });
@@ -75,6 +81,17 @@
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       });
+
+      socket.on('status message',(msg) => {
+        const item = document.createElement('li');
+        item.textContent = msg;
+        item.style.fontWeight = "bold";
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      })
+      socket.on('set name',(name) => {
+        console.log(name);
+      })
     </script>
   </body>
 </html>
