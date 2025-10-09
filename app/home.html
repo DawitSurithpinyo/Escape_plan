@@ -6,10 +6,14 @@
     <style>
       body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-      .column {float: left; padding: 10px; height:100%}
+      /* .column {float: left; padding: 10px; height:100%} */
+
       .left {width: 25%;}
       .right {width: 75%;}
-      .row:after {content: "";display: table;clear: both}
+      body{ border: 1px solid red}
+      .row{display:flex; height:100% ; border:1px solid blue}
+      .column{ border: 1px solid black; }
+      /* .row:after {content: "";display: table;clear: both} */
       #form { background: rgba(99, 74, 74, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
       #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
       #input:focus { outline: none; }
@@ -31,10 +35,10 @@
 
       <div class = "column right">
         <ul id="messages"></ul>
-        <form id="form" action="">
+        </div>
+      <form id="form" action="">
           <input id="input" autocomplete="off" /><button>Send</button>
-        </form></div>
-
+        </form>
         <!-- <div class = "special column">
           <form id="form0">
             <input id="special" autocomplete="off"/><button>Special</button>
