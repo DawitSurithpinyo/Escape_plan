@@ -41,6 +41,10 @@
       border-style: solid;
       display: flex;
     }
+    .grid-cell.pointer{
+      outline: 3px solid limegreen;
+      background-color: chartreuse;
+    }
   </style>
 
   <body>
@@ -88,6 +92,53 @@
       <div class = "column side" style="background-color: salmon">This is to the right</div>
     </div>
     <!-- <div class="full-screen-div">The watcher</div> -->
+     <script>
+      const cells = Array.from(document.querySelectorAll('.grid-div .grid-cell'));
+      let idx = 0;
+      const COLS = 5, ROWS = 5;
+      function setPointer(newIdx) {
+        cells[idx]?.classList.remove('pointer');
+        idx = newIdx;
+        cells[idx]?.classList.add('pointer');
+        // ensure the focused cell is scrolled into view if container ever scrolls
+        cells[idx]?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
+      setPointer(Math.floor(Math.random()*25));
+
+      // Click to move pointer
+      cells.forEach((cell, i) => {
+        cell.addEventListener('click', () => setPointer(i));
+      });
+
+      // Keyboard movement (arrow keys). Prevent page scroll on arrow keys.
+      document.addEventListener('keydown', (e) => {
+        const key = e.key;
+        let next = idx;
+        const col = idx % COLS;
+        const row = Math.floor(idx / COLS);
+
+        if (key === 'ArrowRight') { if (col < COLS - 1) next = idx + 1; e.preventDefault(); }
+        else if (key === 'ArrowLeft') { if (col > 0) next = idx - 1; e.preventDefault(); }
+        else if (key === 'ArrowDown') { if (row < ROWS - 1) next = idx + COLS; e.preventDefault(); }
+        else if (key === 'ArrowUp') { if (row > 0) next = idx - COLS; e.preventDefault(); }
+
+        if (next !== idx) setPointer(next);
+      });
+
+      // Optional: WASD support (gamers rise)
+      document.addEventListener('keydown', (e) => {
+        let next = idx;
+        const col = idx % COLS;
+        const row = Math.floor(idx / COLS);
+
+        if (e.key === 'd' || e.key === 'D') { if (col < COLS - 1) next = idx + 1; }
+        else if (e.key === 'a' || e.key === 'A') { if (col > 0) next = idx - 1; }
+        else if (e.key === 's' || e.key === 'S') { if (row < ROWS - 1) next = idx + COLS; }
+        else if (e.key === 'w' || e.key === 'W') { if (row > 0) next = idx - COLS; }
+
+        if (next !== idx) { e.preventDefault(); setPointer(next); }
+      });
+     </script>
   </body>
 
 </html>
