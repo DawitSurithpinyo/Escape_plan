@@ -14,10 +14,14 @@ function getRandomSpot(){
     return Math.floor(Math.random()*25)
 }
 
-function gridObs(){
-    let grid = emptyGrid()
-    let count =5;
+function gridInit(){
+    let grid = emptyGrid();
     let obsPos = new Set();
+    let wardenPos;
+    let prisonerPos;
+    let tunnelPos;
+
+    let count = 5;
     let i = 0;
     while(i<count){
         let pos = getRandomSpot()
@@ -50,11 +54,49 @@ function gridObs(){
             grid[x][y]="~";
             continue;
         }
-        obsPos.add(pos);
+        // obsPos.add(pos);
+        tunnelPos = pos;
         tunnelNotFound=false;       
     }
 
-    return grid;
+    let hasPrisoner = false;
+    let hasWarden = false;
+
+    while(!hasPrisoner){
+        let spot = getRandomSpot();
+        if (obsPos.has(spot) || spot == tunnelPos) {
+            continue;
+        }
+        let x = Math.floor(spot / 5);
+        let y = spot % 5;
+        grid[x][y] = "P";
+
+        if (countIslands(grid) > 1) {
+            grid[x][y] = "~";
+            continue;
+        }
+        prisonerPos = spot;
+        hasPrisoner = true;
+    }
+
+    while(!hasWarden){
+        let spot = getRandomSpot();
+        if (obsPos.has(spot) || spot == prisonerPos || spot == tunnelPos) {
+            continue;
+        }
+        let x = Math.floor(spot / 5);
+        let y = spot % 5;
+        grid[x][y] = "W";
+
+        if (countIslands(grid) > 1) {
+            grid[x][y] = "~";
+            continue;
+        }
+        wardenPos = spot;
+        hasWarden = true;
+    }
+
+    return {grid, obsPos, wardenPos, prisonerPos, tunnelPos}
 }
 
 function display_grid(grid){
@@ -116,11 +158,11 @@ function countIslands(grid){
 function test(){
     const emptygrid = emptyGrid();
     display_grid(emptygrid)
-    const grid =gridObs();
+    const {grid, obsPos, wardenPos, prisonerPos, tunnelPos} = gridInit();
     display_grid(grid)
     let islandCount = countIslands(grid)
     console.log(islandCount)
     // checkConsec(grid)
 }
 
-test()
+export {gridInit, display_grid}
