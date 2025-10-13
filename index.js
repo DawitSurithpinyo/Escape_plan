@@ -2,6 +2,7 @@ const express = require('express');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
 const { Server } = require('socket.io');
+const { gameIO } = require('./lib/game.js');
 
 const app = express();
 const server = createServer(app);
@@ -24,16 +25,13 @@ app.get('/server', (req, res) => {
 
 // Initialize socket handlers
 require('./lib/home')(io);
-// require('./lib/game')(io);
+gameIO(io);
 // require('./lib/server')(io);
-
-
 
 server.listen(3000, () => {
   console.log('server running at http://localhost:3000');
 });
 
-module.exports = io;
 
 //Fundmental Checkpoint close to finish
 //Can do multiple devices

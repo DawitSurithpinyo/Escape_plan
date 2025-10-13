@@ -1,3 +1,5 @@
+export {gridInit, display_grid}
+
 function emptyGrid(){
     let grid = new Array();
     let size = 5;
@@ -164,5 +166,3 @@ function test(){
     console.log(islandCount)
     // checkConsec(grid)
 }
-
-export {gridInit, display_grid}

@@ -122,6 +122,65 @@
     <!-- <div class="full-screen-div">The watcher</div> -->
   </body>
 
-  <script type="module" src="../lib/game.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module">
+    import { gridInit, display_grid } from '../util/algotest.js';
+
+    function _initObjectPosition(htmlElem, posInGrid){
+        let elemStyle = window.getComputedStyle(htmlElem);
+
+        // row positioning
+        let topVal = elemStyle.getPropertyValue("top").replace("px", "");
+        htmlElem.style.top = (Number(topVal) + (Math.floor(posInGrid / 5) * 20)) + "%";
+
+        // column positioning
+        let leftVal = elemStyle.getPropertyValue("left").replace("px", "");
+        htmlElem.style.left = (Number(leftVal) + ((posInGrid % 5) * 20)) + "%";
+    }
+
+    function gameStart(grid, obsPos, wardenPos, prisonerPos, tunnelPos){
+        if(!grid && !obsPos && !wardenPos && !prisonerPos && !tunnelPos){
+          // generate random map
+          const result = gridInit();
+          grid = result.grid;
+          obsPos = result.obsPos;
+          wardenPos = result.wardenPos;
+          prisonerPos = result.prisonerPos;
+          tunnelPos = result.tunnelPos;
+        }
+        display_grid(grid)
+
+        // put objects to their starting position
+        let obsPosArray = Array.from(obsPos);
+        for(let i = 0; i < obsPosArray.length; i++){
+            let pos = obsPosArray[i];
+            let obs = document.getElementById(`obstacle${i}`);
+            _initObjectPosition(obs, pos);
+        }
+
+        let prisoner = document.getElementById("prisoner");
+        _initObjectPosition(prisoner, prisonerPos);
+
+        let warden = document.getElementById("warden");
+        _initObjectPosition(warden, wardenPos);
+
+        let tunnel = document.getElementById("tunnel");
+        _initObjectPosition(tunnel, tunnelPos);
+    }
+
+    // custom "namespace" to split logic of game IO from other IO
+    const socket = io("/game");
+
+    // "connect" is a built-in event in socket.io. It's auto called every time browser's socket connects successfully
+    socket.on("connect", () => {
+      console.log("Connected to game namespace");
+    });
+
+    // custom event, must be emitted by server to be activated
+    socket.on('game connection', () => {
+      
+      gameStart();
+    });
+  </script>
 
 </html>
