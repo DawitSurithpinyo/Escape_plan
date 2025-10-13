@@ -25,6 +25,7 @@
       margin-top: 5%;
       display: flex; /* prevent child div overflowing */
       flex-direction: column;
+      position: relative;
     }
     .grid-row{
       width: 100%;
@@ -45,13 +46,40 @@
       outline: 3px solid limegreen;
       background-color: chartreuse;
     }
+    .game_obj{ /* images of warden, prisoner, obstacles, tunnel, etc. */
+      /* position: absolute;
+      margin-top: -100px;
+      margin-left: -100px;
+        */
+      position: absolute;
+      width: 20%;
+      height: 20%;
+      /* align-self: center; */
+      z-index: 10;
+      /* margin: auto; */
+      /* top: 100px; */
+      left: 0%;
+      top: 0%;
+      /* transform: translate(-50%); */
+      /* left: 100%; */
+      /* bottom: 20px; */
+    }
   </style>
 
   <body>
     <div class="row">
       <div class = "column side" style="background-color: aqua;">This is to the left</div>
       <div class = "column middle" style="background-color: aliceblue">
-        <div class = "grid-div">
+        <div class = "grid-div" id="main grid">
+          <img src="../assets/warden_icon.png" alt="warden" id="warden" class="game_obj">
+          <img src="../assets/prisoner_icon.png" alt="prisoner" id="prisoner" class="game_obj">
+          <img src="../assets/tunnel_icon.png" alt="tunnel" id="tunnel" class="game_obj">
+          <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle0" class="game_obj">
+          <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle1" class="game_obj">
+          <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle2" class="game_obj">
+          <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle3" class="game_obj">
+          <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle4" class="game_obj">
+
           <div class = "grid-row" id="row 0">
             <div class = "grid-cell" id="cell 0"></div>
             <div class = "grid-cell" id="cell 1"></div>
@@ -92,53 +120,8 @@
       <div class = "column side" style="background-color: salmon">This is to the right</div>
     </div>
     <!-- <div class="full-screen-div">The watcher</div> -->
-     <script>
-      const cells = Array.from(document.querySelectorAll('.grid-div .grid-cell'));
-      let idx = 0;
-      const COLS = 5, ROWS = 5;
-      function setPointer(newIdx) {
-        cells[idx]?.classList.remove('pointer');
-        idx = newIdx;
-        cells[idx]?.classList.add('pointer');
-        // ensure the focused cell is scrolled into view if container ever scrolls
-        cells[idx]?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-      }
-      setPointer(Math.floor(Math.random()*25));
-
-      // Click to move pointer
-      cells.forEach((cell, i) => {
-        cell.addEventListener('click', () => setPointer(i));
-      });
-
-      // Keyboard movement (arrow keys). Prevent page scroll on arrow keys.
-      document.addEventListener('keydown', (e) => {
-        const key = e.key;
-        let next = idx;
-        const col = idx % COLS;
-        const row = Math.floor(idx / COLS);
-
-        if (key === 'ArrowRight') { if (col < COLS - 1) next = idx + 1; e.preventDefault(); }
-        else if (key === 'ArrowLeft') { if (col > 0) next = idx - 1; e.preventDefault(); }
-        else if (key === 'ArrowDown') { if (row < ROWS - 1) next = idx + COLS; e.preventDefault(); }
-        else if (key === 'ArrowUp') { if (row > 0) next = idx - COLS; e.preventDefault(); }
-
-        if (next !== idx) setPointer(next);
-      });
-
-      // Optional: WASD support (gamers rise)
-      document.addEventListener('keydown', (e) => {
-        let next = idx;
-        const col = idx % COLS;
-        const row = Math.floor(idx / COLS);
-
-        if (e.key === 'd' || e.key === 'D') { if (col < COLS - 1) next = idx + 1; }
-        else if (e.key === 'a' || e.key === 'A') { if (col > 0) next = idx - 1; }
-        else if (e.key === 's' || e.key === 'S') { if (row < ROWS - 1) next = idx + COLS; }
-        else if (e.key === 'w' || e.key === 'W') { if (row > 0) next = idx - COLS; }
-
-        if (next !== idx) { e.preventDefault(); setPointer(next); }
-      });
-     </script>
   </body>
+
+  <script type="module" src="../lib/game.js"></script>
 
 </html>
