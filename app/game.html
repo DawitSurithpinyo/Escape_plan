@@ -148,10 +148,17 @@
           prisonerPos = result.prisonerPos;
           tunnelPos = result.tunnelPos;
         }
-        display_grid(grid)
-
+        display_grid(grid);
+        
+        let obsPosArray;
+        if(typeof obsPos === 'Set'){
+          obsPosArray = Array.from(obsPos);
+        }
+        else{
+          obsPosArray = obsPos
+        }
+        
         // put objects to their starting position
-        let obsPosArray = Array.from(obsPos);
         for(let i = 0; i < obsPosArray.length; i++){
             let pos = obsPosArray[i];
             let obs = document.getElementById(`obstacle${i}`);
@@ -177,9 +184,8 @@
     });
 
     // custom event, must be emitted by server to be activated
-    socket.on('game connection', () => {
-      
-      gameStart();
+    socket.on("start game", (data) => {
+      gameStart(data.grid, data.obsPosArray, data.wardenPos, data.prisonerPos, data.tunnelPos);
     });
   </script>
 

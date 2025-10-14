@@ -1,12 +1,17 @@
+// require('dotenv').config()
 const express = require('express');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
 const { Server } = require('socket.io');
+// const { MongoClient } = require('mongodb');
 const { gameIO } = require('./lib/game.js');
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
+
+// const client = new MongoClient(process.env.MONGO_URI);
+// const db = client.db('escape_plan');
 
 app.use(express.static(__dirname));
 
@@ -33,6 +38,7 @@ server.listen(3000, () => {
 });
 
 
+// module.exports = db;
 //Fundmental Checkpoint close to finish
 //Can do multiple devices
 //As of 9/19 10%
