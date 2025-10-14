@@ -1,192 +1,266 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Game page</title>
-  </head>
-  <style>
-    html{height: 100%;}
-    body{margin: 0;height:100%}
-    .row{display:flex; margin: 0; width: 100%; height: 100%} 
-    .column{ margin: 0}
-    .side {width: 25%;margin: 0}
-    .middle{width:50%;margin: 0}
-    .full-screen-div{height: 100vh; width: 100vw;background-color: blueviolet;}
 
-    .grid-div{
-      width: 80%; 
-      height: 80%; 
-      border-color: black;
-      border-width: 1px;
-      border-style: solid;
-      background-color: grey;
-      margin-left: auto; /* auto margin-left = push to right */
-      margin-right: auto; /* auto both margins = centered */
-      margin-top: 5%;
-      display: flex; /* prevent child div overflowing */
-      flex-direction: column;
-      position: relative;
-    }
-    .grid-row{
-      width: 100%;
-      height: 20%;
-      flex-direction: row;
-      display: flex;
-    }
-    .grid-cell{
-      width: 20%;
-      height: 100%;
-      margin: 0%;
-      border-color: black;
-      border-width: 1px;
-      border-style: solid;
-      display: flex;
-    }
-    .grid-cell.pointer{
-      outline: 3px solid limegreen;
-      background-color: chartreuse;
-    }
-    .game_obj{ /* images of warden, prisoner, obstacles, tunnel, etc. */
-      /* position: absolute;
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Game page</title>
+</head>
+<style>
+  html {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    height: 100%
+  }
+
+  .row {
+    display: flex;
+    margin: 0;
+    width: 100%;
+    height: 100%
+  }
+
+  .column {
+    margin: 0
+  }
+
+  .side {
+    width: 25%;
+    margin: 0
+  }
+
+  .middle {
+    width: 50%;
+    margin: 0
+  }
+
+  .full-screen-div {
+    height: 100vh;
+    width: 100vw;
+    background-color: blueviolet;
+  }
+
+  .grid-div {
+    width: 80%;
+    height: 80%;
+    border-color: black;
+    border-width: 1px;
+    border-style: solid;
+    background-color: grey;
+    margin-left: auto;
+    /* auto margin-left = push to right */
+    margin-right: auto;
+    /* auto both margins = centered */
+    margin-top: 5%;
+    display: flex;
+    /* prevent child div overflowing */
+    flex-direction: column;
+    position: relative;
+  }
+
+  .grid-row {
+    width: 100%;
+    height: 20%;
+    flex-direction: row;
+    display: flex;
+  }
+
+  .grid-cell {
+    width: 20%;
+    height: 100%;
+    margin: 0%;
+    border-color: black;
+    border-width: 1px;
+    border-style: solid;
+    display: flex;
+  }
+
+  .grid-cell.pointer {
+    outline: 3px solid limegreen;
+    background-color: chartreuse;
+  }
+
+  .game_obj {
+    /* images of warden, prisoner, obstacles, tunnel, etc. */
+    /* position: absolute;
       margin-top: -100px;
       margin-left: -100px;
         */
-      position: absolute;
-      width: 20%;
-      height: 20%;
-      /* align-self: center; */
-      z-index: 10;
-      /* margin: auto; */
-      /* top: 100px; */
-      left: 0%;
-      top: 0%;
-      /* transform: translate(-50%); */
-      /* left: 100%; */
-      /* bottom: 20px; */
-    }
-  </style>
+    position: absolute;
+    width: 20%;
+    height: 20%;
+    /* align-self: center; */
+    z-index: 10;
+    /* margin: auto; */
+    /* top: 100px; */
+    left: 0%;
+    top: 0%;
+    /* transform: translate(-50%); */
+    /* left: 100%; */
+    /* bottom: 20px; */
+  }
+</style>
 
-  <body>
-    <div class="row">
-      <div class = "column side" style="background-color: aqua;">This is to the left</div>
-      <div class = "column middle" style="background-color: aliceblue">
-        <div class = "grid-div" id="main grid">
-          <img src="../assets/warden_icon.png" alt="warden" id="warden" class="game_obj">
-          <img src="../assets/prisoner_icon.png" alt="prisoner" id="prisoner" class="game_obj">
-          <img src="../assets/tunnel_icon.png" alt="tunnel" id="tunnel" class="game_obj">
-          <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle0" class="game_obj">
-          <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle1" class="game_obj">
-          <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle2" class="game_obj">
-          <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle3" class="game_obj">
-          <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle4" class="game_obj">
+<body>
+  <div class="row">
+    <div class="column side" style="background-color: aqua;">This is to the left</div>
+    <div class="column middle" style="background-color: aliceblue">
+      <div class="grid-div" id="main grid">
+        <img src="../assets/warden_icon.png" alt="warden" id="warden" class="game_obj">
+        <img src="../assets/prisoner_icon.png" alt="prisoner" id="prisoner" class="game_obj">
+        <img src="../assets/tunnel_icon.png" alt="tunnel" id="tunnel" class="game_obj">
+        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle0" class="game_obj">
+        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle1" class="game_obj">
+        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle2" class="game_obj">
+        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle3" class="game_obj">
+        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle4" class="game_obj">
 
-          <div class = "grid-row" id="row 0">
-            <div class = "grid-cell" id="cell 0"></div>
-            <div class = "grid-cell" id="cell 1"></div>
-            <div class = "grid-cell" id="cell 2"></div>
-            <div class = "grid-cell" id="cell 3"></div>
-            <div class = "grid-cell" id="cell 4"></div>
-          </div>
-          <div class = "grid-row" id="row 1">
-            <div class = "grid-cell" id="cell 5"></div>
-            <div class = "grid-cell" id="cell 6"></div>
-            <div class = "grid-cell" id="cell 7"></div>
-            <div class = "grid-cell" id="cell 8"></div>
-            <div class = "grid-cell" id="cell 9"></div>
-          </div>
-          <div class = "grid-row" id="row 2">
-            <div class = "grid-cell" id="cell 10"></div>
-            <div class = "grid-cell" id="cell 11"></div>
-            <div class = "grid-cell" id="cell 12"></div>
-            <div class = "grid-cell" id="cell 13"></div>
-            <div class = "grid-cell" id="cell 14"></div>
-          </div>
-          <div class = "grid-row" id="row 3">
-            <div class = "grid-cell" id="cell 15"></div>
-            <div class = "grid-cell" id="cell 16"></div>
-            <div class = "grid-cell" id="cell 17"></div>
-            <div class = "grid-cell" id="cell 18"></div>
-            <div class = "grid-cell" id="cell 19"></div>
-          </div>
-          <div class = "grid-row" id="row 4">
-            <div class = "grid-cell" id="cell 20"></div>
-            <div class = "grid-cell" id="cell 21"></div>
-            <div class = "grid-cell" id="cell 22"></div>
-            <div class = "grid-cell" id="cell 23"></div>
-            <div class = "grid-cell" id="cell 24"></div>
-          </div>
+        <div class="grid-row" id="row 0">
+          <div class="grid-cell" id="cell 0"></div>
+          <div class="grid-cell" id="cell 1"></div>
+          <div class="grid-cell" id="cell 2"></div>
+          <div class="grid-cell" id="cell 3"></div>
+          <div class="grid-cell" id="cell 4"></div>
+        </div>
+        <div class="grid-row" id="row 1">
+          <div class="grid-cell" id="cell 5"></div>
+          <div class="grid-cell" id="cell 6"></div>
+          <div class="grid-cell" id="cell 7"></div>
+          <div class="grid-cell" id="cell 8"></div>
+          <div class="grid-cell" id="cell 9"></div>
+        </div>
+        <div class="grid-row" id="row 2">
+          <div class="grid-cell" id="cell 10"></div>
+          <div class="grid-cell" id="cell 11"></div>
+          <div class="grid-cell" id="cell 12"></div>
+          <div class="grid-cell" id="cell 13"></div>
+          <div class="grid-cell" id="cell 14"></div>
+        </div>
+        <div class="grid-row" id="row 3">
+          <div class="grid-cell" id="cell 15"></div>
+          <div class="grid-cell" id="cell 16"></div>
+          <div class="grid-cell" id="cell 17"></div>
+          <div class="grid-cell" id="cell 18"></div>
+          <div class="grid-cell" id="cell 19"></div>
+        </div>
+        <div class="grid-row" id="row 4">
+          <div class="grid-cell" id="cell 20"></div>
+          <div class="grid-cell" id="cell 21"></div>
+          <div class="grid-cell" id="cell 22"></div>
+          <div class="grid-cell" id="cell 23"></div>
+          <div class="grid-cell" id="cell 24"></div>
         </div>
       </div>
-      <div class = "column side" style="background-color: salmon">This is to the right</div>
     </div>
-    <!-- <div class="full-screen-div">The watcher</div> -->
-  </body>
+    <div class="column side" style="background-color: salmon">This is to the right</div>
+  </div>
+  <!-- <div class="full-screen-div">The watcher</div> -->
+</body>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script type="module">
-    import { gridInit, display_grid } from '../util/algotest.js';
+<script src="/socket.io/socket.io.js"></script>
+<script type="module">
+  import { gridInit, display_grid } from '../util/algotest.js';
 
-    function _initObjectPosition(htmlElem, posInGrid){
-        let elemStyle = window.getComputedStyle(htmlElem);
+  function _initObjectPosition(htmlElem, posInGrid) {
+    let elemStyle = window.getComputedStyle(htmlElem);
 
-        // row positioning
-        let topVal = elemStyle.getPropertyValue("top").replace("px", "");
-        htmlElem.style.top = (Number(topVal) + (Math.floor(posInGrid / 5) * 20)) + "%";
+    // row positioning
+    let topVal = elemStyle.getPropertyValue("top").replace("px", "");
+    htmlElem.style.top = (Number(topVal) + (Math.floor(posInGrid / 5) * 20)) + "%";
 
-        // column positioning
-        let leftVal = elemStyle.getPropertyValue("left").replace("px", "");
-        htmlElem.style.left = (Number(leftVal) + ((posInGrid % 5) * 20)) + "%";
+    // column positioning
+    let leftVal = elemStyle.getPropertyValue("left").replace("px", "");
+    htmlElem.style.left = (Number(leftVal) + ((posInGrid % 5) * 20)) + "%";
+  }
+
+  function gameStart(grid, obsPos, wardenPos, prisonerPos, tunnelPos) {
+    if (!grid && !obsPos && !wardenPos && !prisonerPos && !tunnelPos) {
+      // generate random map
+      const result = gridInit();
+      grid = result.grid;
+      obsPos = result.obsPos;
+      wardenPos = result.wardenPos;
+      prisonerPos = result.prisonerPos;
+      tunnelPos = result.tunnelPos;
+    }
+    display_grid(grid);
+
+    let obsPosArray;
+    if (typeof obsPos === 'Set') {
+      obsPosArray = Array.from(obsPos);
+    }
+    else {
+      obsPosArray = obsPos
     }
 
-    function gameStart(grid, obsPos, wardenPos, prisonerPos, tunnelPos){
-        if(!grid && !obsPos && !wardenPos && !prisonerPos && !tunnelPos){
-          // generate random map
-          const result = gridInit();
-          grid = result.grid;
-          obsPos = result.obsPos;
-          wardenPos = result.wardenPos;
-          prisonerPos = result.prisonerPos;
-          tunnelPos = result.tunnelPos;
-        }
-        display_grid(grid);
-        
-        let obsPosArray;
-        if(typeof obsPos === 'Set'){
-          obsPosArray = Array.from(obsPos);
-        }
-        else{
-          obsPosArray = obsPos
-        }
-        
-        // put objects to their starting position
-        for(let i = 0; i < obsPosArray.length; i++){
-            let pos = obsPosArray[i];
-            let obs = document.getElementById(`obstacle${i}`);
-            _initObjectPosition(obs, pos);
-        }
-
-        let prisoner = document.getElementById("prisoner");
-        _initObjectPosition(prisoner, prisonerPos);
-
-        let warden = document.getElementById("warden");
-        _initObjectPosition(warden, wardenPos);
-
-        let tunnel = document.getElementById("tunnel");
-        _initObjectPosition(tunnel, tunnelPos);
+    // put objects to their starting position
+    for (let i = 0; i < obsPosArray.length; i++) {
+      let pos = obsPosArray[i];
+      let obs = document.getElementById(`obstacle${i}`);
+      _initObjectPosition(obs, pos);
     }
 
-    // custom "namespace" to split logic of game IO from other IO
-    const socket = io("/game");
+    let prisoner = document.getElementById("prisoner");
+    _initObjectPosition(prisoner, prisonerPos);
 
-    // "connect" is a built-in event in socket.io. It's auto called every time browser's socket connects successfully
-    socket.on("connect", () => {
-      console.log("Connected to game namespace");
-    });
+    let warden = document.getElementById("warden");
+    _initObjectPosition(warden, wardenPos);
 
-    // custom event, must be emitted by server to be activated
-    socket.on("start game", (data) => {
-      gameStart(data.grid, data.obsPosArray, data.wardenPos, data.prisonerPos, data.tunnelPos);
-    });
-  </script>
+    let tunnel = document.getElementById("tunnel");
+    _initObjectPosition(tunnel, tunnelPos);
+  }
+  
+  function moveCharacter(elemId, dx, dy) {
+    const elem = document.getElementById(elemId);
+    const top = parseFloat(elem.style.top);
+    const left = parseFloat(elem.style.left);
+
+    // Each grid cell is 20% in width and height
+    let newTop = top + dy * 20;
+    let newLeft = left + dx * 20;
+
+    // Stay within 0%–80%
+    newTop = Math.max(0, Math.min(80, newTop));
+    newLeft = Math.max(0, Math.min(80, newLeft));
+
+    elem.style.top = `${newTop}%`;
+    elem.style.left = `${newLeft}%`;
+  }
+
+  // Handle key presses
+  document.addEventListener("keydown", (e) => {
+    switch (e.key) {
+      // Arrow keys for prisoner
+      case "ArrowUp":
+        moveCharacter("prisoner", 0, -1);
+        break;
+      case "ArrowDown":
+        moveCharacter("prisoner", 0, 1);
+        break;
+      case "ArrowLeft":
+        moveCharacter("prisoner", -1, 0);
+        break;
+      case "ArrowRight":
+        moveCharacter("prisoner", 1, 0);
+        break;
+    }
+  });
+
+
+  // custom "namespace" to split logic of game IO from other IO
+  const socket = io("/game");
+
+  // "connect" is a built-in event in socket.io. It's auto called every time browser's socket connects successfully
+  socket.on("connect", () => {
+    console.log("Connected to game namespace");
+  });
+
+  // custom event, must be emitted by server to be activated
+  socket.on("start game", (data) => {
+    gameStart(data.grid, data.obsPosArray, data.wardenPos, data.prisonerPos, data.tunnelPos);
+  });
+</script>
 
 </html>
