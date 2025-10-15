@@ -48,7 +48,7 @@
     border-color: black;
     border-width: 1px;
     border-style: solid;
-    background-color: grey;
+    background-color: rgb(71, 71, 71);
     margin-left: auto;
     /* auto margin-left = push to right */
     margin-right: auto;
@@ -211,23 +211,52 @@
     let tunnel = document.getElementById("tunnel");
     _initObjectPosition(tunnel, tunnelPos);
   }
-  
+
+  // Movement for prisoner (arrow keys) and warden (WASD)
   function moveCharacter(elemId, dx, dy) {
     const elem = document.getElementById(elemId);
     const top = parseFloat(elem.style.top);
     const left = parseFloat(elem.style.left);
 
-    // Each grid cell is 20% in width and height
-    let newTop = top + dy * 20;
-    let newLeft = left + dx * 20;
+    // Each grid cell = 20%
+    const STEP = 20;
+    const COLS = 5;
+    const ROWS = 5;
 
-    // Stay within 0%–80%
-    newTop = Math.max(0, Math.min(80, newTop));
-    newLeft = Math.max(0, Math.min(80, newLeft));
+    // Convert current % position to grid coordinates
+    let row = Math.round(top / STEP);
+    let col = Math.round(left / STEP);
 
-    elem.style.top = `${newTop}%`;
-    elem.style.left = `${newLeft}%`;
+    // Calculate intended position
+    const newRow = row + dy;
+    const newCol = col + dx;
+
+    // Keep inside grid bounds
+    if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLS) return;
+
+    // Compute target cell index (0–24)
+    const targetCell = newRow * COLS + newCol;
+
+    // Gather all obstacle positions
+    const obstaclePositions = [];
+    for (let i = 0; i < 5; i++) {
+      const obs = document.getElementById(`obstacle${i}`);
+      if (!obs) continue;
+      const ot = parseFloat(obs.style.top) || 0;
+      const ol = parseFloat(obs.style.left) || 0;
+      const orow = Math.round(ot / STEP);
+      const ocol = Math.round(ol / STEP);
+      obstaclePositions.push(orow * COLS + ocol);
+    }
+
+    // Block movement if target cell has obstacle
+    if (obstaclePositions.includes(targetCell)) return;
+
+    // Move to new position
+    elem.style.top = `${newRow * STEP}%`;
+    elem.style.left = `${newCol * STEP}%`;
   }
+
 
   // Handle key presses
   document.addEventListener("keydown", (e) => {
