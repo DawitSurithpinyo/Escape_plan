@@ -212,32 +212,25 @@
     _initObjectPosition(tunnel, tunnelPos);
   }
 
-  // Movement for prisoner (arrow keys) and warden (WASD)
   function moveCharacter(elemId, dx, dy) {
     const elem = document.getElementById(elemId);
     const top = parseFloat(elem.style.top);
     const left = parseFloat(elem.style.left);
 
-    // Each grid cell = 20%
     const STEP = 20;
     const COLS = 5;
     const ROWS = 5;
 
-    // Convert current % position to grid coordinates
     let row = Math.round(top / STEP);
     let col = Math.round(left / STEP);
 
-    // Calculate intended position
     const newRow = row + dy;
     const newCol = col + dx;
 
-    // Keep inside grid bounds
     if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLS) return;
 
-    // Compute target cell index (0–24)
     const targetCell = newRow * COLS + newCol;
 
-    // Gather all obstacle positions
     const obstaclePositions = [];
     for (let i = 0; i < 5; i++) {
       const obs = document.getElementById(`obstacle${i}`);
@@ -249,10 +242,8 @@
       obstaclePositions.push(orow * COLS + ocol);
     }
 
-    // Block movement if target cell has obstacle
     if (obstaclePositions.includes(targetCell)) return;
 
-    // Move to new position
     elem.style.top = `${newRow * STEP}%`;
     elem.style.left = `${newCol * STEP}%`;
   }
