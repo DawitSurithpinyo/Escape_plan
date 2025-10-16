@@ -254,16 +254,16 @@
     switch (e.key) {
       // Arrow keys for prisoner
       case "ArrowUp":
-        moveCharacter("prisoner", 0, -1);
+        socket.emit("prisoner move", {'dx': 0, 'dy': -1});
         break;
       case "ArrowDown":
-        moveCharacter("prisoner", 0, 1);
+        socket.emit("prisoner move", {'dx': 0, 'dy': 1});
         break;
       case "ArrowLeft":
-        moveCharacter("prisoner", -1, 0);
+        socket.emit("prisoner move", {'dx': -1, 'dy': 0});
         break;
       case "ArrowRight":
-        moveCharacter("prisoner", 1, 0);
+        socket.emit("prisoner move", {'dx': 1, 'dy': 0});
         break;
     }
   });
@@ -280,6 +280,10 @@
   // custom event, must be emitted by server to be activated
   socket.on("start game", (data) => {
     gameStart(data.grid, data.obsPosArray, data.wardenPos, data.prisonerPos, data.tunnelPos);
+  });
+
+  socket.on("prisoner moved", ({dx, dy}) => {
+    moveCharacter("prisoner", dx, dy);
   });
 </script>
 
