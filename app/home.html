@@ -22,6 +22,7 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages > li { padding: 0.5rem 1rem; }
       #messages > li:nth-child(odd) { background: #efefef; }
+      .button {background-color: #4CAF50; /* Green */color: white;width: 100%;border-radius: 8px;border: none;padding: 10px;margin-top: 10px;font-size: 16px;cursor: pointer;}
     </style>
   </head>
   <body>
@@ -30,6 +31,7 @@
         <h1 id = "username">Username : </h1>
         <form id="form1" action="">
           <input id="name" autocomplete="off" /><button>Confirm</button></form>
+          <button id="gamebutton" class="button">Play</button>
       </div>
 
 
@@ -57,6 +59,7 @@
       const input = document.getElementById('input');
       const messages = document.getElementById('messages');
 
+
       form1.addEventListener('submit', (e) => {
         e.preventDefault();
         if (name.value) {
@@ -76,6 +79,15 @@
           //socket.emit('chat message', "yooooooooooooooo");
           input.value = '';
         }
+      });
+
+      const gamebutton = document.getElementById('gamebutton');
+
+      gamebutton.addEventListener('click', (e) => {
+        e.preventDefault();
+        const currentUser = username.textContent
+        socket.emit('game start', currentUser)
+        window.location.href = "/game"
       });
 
       socket.on('chat message', (msg) => {
