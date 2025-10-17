@@ -83,7 +83,7 @@
   }
 
   .game_obj {
-    /* images of warden, prisoner, obstacles, tunnel, etc. */
+    /* images of warder, prisoner, obstacles, tunnel, etc. */
     /* position: absolute;
       margin-top: -100px;
       margin-left: -100px;
@@ -108,7 +108,7 @@
     <div class="column side" style="background-color: aqua;">This is to the left</div>
     <div class="column middle" style="background-color: aliceblue">
       <div class="grid-div" id="main grid">
-        <img src="../assets/warder_icon.png" alt="warden" id="warden" class="game_obj">
+        <img src="../assets/warder_icon.png" alt="warder" id="warder" class="game_obj">
         <img src="../assets/prisoner_icon.png" alt="prisoner" id="prisoner" class="game_obj">
         <img src="../assets/tunnel_icon.png" alt="tunnel" id="tunnel" class="game_obj">
         <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle0" class="game_obj">
@@ -177,13 +177,13 @@
     htmlElem.style.left = (Number(leftVal) + ((posInGrid % 5) * 20)) + "%";
   }
 
-  function gameStart(grid, obsPos, wardenPos, prisonerPos, tunnelPos) {
-    if (!grid && !obsPos && !wardenPos && !prisonerPos && !tunnelPos) {
+  function gameStart(grid, obsPos, warderPos, prisonerPos, tunnelPos) {
+    if (!grid && !obsPos && !warderPos && !prisonerPos && !tunnelPos) {
       // generate random map
       const result = gridInit();
       grid = result.grid;
       obsPos = result.obsPos;
-      wardenPos = result.wardenPos;
+      warderPos = result.wardrnPos;
       prisonerPos = result.prisonerPos;
       tunnelPos = result.tunnelPos;
     }
@@ -207,8 +207,8 @@
     let prisoner = document.getElementById("prisoner");
     _initObjectPosition(prisoner, prisonerPos);
 
-    let warden = document.getElementById("warden");
-    _initObjectPosition(warden, wardenPos);
+    let warder = document.getElementById("warder");
+    _initObjectPosition(warder, warderPos);
 
     let tunnel = document.getElementById("tunnel");
     _initObjectPosition(tunnel, tunnelPos);
@@ -314,7 +314,7 @@
 
   // custom event, must be emitted by server to be activated
   socket.on("start game", (data) => {
-    gameStart(data.grid, data.obsPosArray, data.wardenPos, data.prisonerPos, data.tunnelPos, data.character);
+    gameStart(data.grid, data.obsPosArray, data.warderPos, data.prisonerPos, data.tunnelPos, data.character);
     document.getElementById("player character").textContent = `You are ${data.character}`
   });
 
