@@ -19,7 +19,7 @@ function getRandomSpot(){
 function gridInit(){
     let grid = emptyGrid();
     let obsPos = new Set();
-    let wardenPos;
+    let warderPos;
     let prisonerPos;
     let tunnelPos;
 
@@ -94,11 +94,11 @@ function gridInit(){
             grid[x][y] = "~";
             continue;
         }
-        wardenPos = spot;
+        warderPos = spot;
         hasWarden = true;
     }
 
-    return {grid, obsPos, wardenPos, prisonerPos, tunnelPos}
+    return {grid, obsPos, warderPos, prisonerPos, tunnelPos}
 }
 
 function display_grid(grid){

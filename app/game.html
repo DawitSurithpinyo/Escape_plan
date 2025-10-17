@@ -167,6 +167,7 @@
 
   function _initObjectPosition(htmlElem, posInGrid) {
     let elemStyle = window.getComputedStyle(htmlElem);
+    //console.log(`Initiating position for ${elemStyle}...`);
 
     // row positioning
     let topVal = elemStyle.getPropertyValue("top").replace("px", "");
@@ -175,6 +176,7 @@
     // column positioning
     let leftVal = elemStyle.getPropertyValue("left").replace("px", "");
     htmlElem.style.left = (Number(leftVal) + ((posInGrid % 5) * 20)) + "%";
+    //console.log(`Completed! ${htmlElem.style.top},${htmlElem.style.left}`);
   }
 
   function gameStart(grid, obsPos, warderPos, prisonerPos, tunnelPos) {
@@ -186,7 +188,9 @@
       warderPos = result.warderPos;
       prisonerPos = result.prisonerPos;
       tunnelPos = result.tunnelPos;
+      
     }
+    //console.log(`Hello, is this ${result}`);
     display_grid(grid);
 
     let obsPosArray;
@@ -234,6 +238,7 @@
     const elem = document.getElementById(elemId);
     const top = parseFloat(elem.style.top);
     const left = parseFloat(elem.style.left);
+    console.log(elem);
 
     const STEP = 20;
     const COLS = 5;
@@ -261,9 +266,11 @@
     }
 
     if (obstaclePositions.includes(targetCell)) return;
-
+    
+    console.log(elem.style.top);
     elem.style.top = `${newRow * STEP}%`;
     elem.style.left = `${newCol * STEP}%`;
+    console.log(elem.style.top);
   }
 
   let keyEventHandler; // required for removeEventListener()
@@ -275,25 +282,20 @@
       }
 
       keyEventHandler = (e) => {
-        switch (e.key) {
-          // Arrow keys
-          case "ArrowUp":
-            socket.emit(`${character} select move`, {'dx': 0, 'dy': -1});
-            break;
-          case "ArrowDown":
-            socket.emit(`${character} select move`, {'dx': 0, 'dy': 1});
-            break;
-          case "ArrowLeft":
-            socket.emit(`${character} select move`, {'dx': -1, 'dy': 0});
-            break;
-          case "ArrowRight":
-            socket.emit(`${character} select move`, {'dx': 1, 'dy': 0});
-            break;
+        if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)){
+          e.preventDefault();
+          if (e.repeat) return;
+
+          const dir = {
+            ArrowUp: {dx:0,dy:1}, ArrowDown: {dx:0,dy:-1}, ArrowLeft: {dx:-1,dy:0}, ArrowRight: {dx:1,dy:0}
+          }[e.key];
+
+          socket.emit(`${character} select move`, dir);
         }
-      }
+      };
       document.addEventListener("keydown", keyEventHandler);
     }
-    else if(!enable) {
+    else {
       document.removeEventListener("keydown", keyEventHandler);
       keyEventHandler = null;
     }
@@ -332,10 +334,11 @@
   });
 
   socket.on("turn end", (data) => {
-    console.log("turn end reached");
+    console.log(`${data.character}'s turn has ended.`);
     console.log(data)
     enableMoveSelection(false, data.character);
     if (data.dx !== null && data.dy !== null) {
+      console.log("MOVE, BRO.");
       moveCharacter(data.character, data.dx, data.dy);
     }
   })
