@@ -108,7 +108,7 @@
     <div class="column side" style="background-color: aqua;">This is to the left</div>
     <div class="column middle" style="background-color: aliceblue">
       <div class="grid-div" id="main grid">
-        <img src="../assets/warden_icon.png" alt="warden" id="warden" class="game_obj">
+        <img src="../assets/warder_icon.png" alt="warden" id="warden" class="game_obj">
         <img src="../assets/prisoner_icon.png" alt="prisoner" id="prisoner" class="game_obj">
         <img src="../assets/tunnel_icon.png" alt="tunnel" id="tunnel" class="game_obj">
         <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle0" class="game_obj">
@@ -153,6 +153,8 @@
           <div class="grid-cell" id="cell 24"></div>
         </div>
       </div>
+      <text id="countdown"></text>
+      <text id="player character"></text>
     </div>
     <div class="column side" style="background-color: salmon">This is to the right</div>
   </div>
@@ -188,7 +190,7 @@
     display_grid(grid);
 
     let obsPosArray;
-    if (typeof obsPos === 'Set') {
+    if (obsPos instanceof Set) {
       obsPosArray = Array.from(obsPos);
     }
     else {
@@ -210,6 +212,22 @@
 
     let tunnel = document.getElementById("tunnel");
     _initObjectPosition(tunnel, tunnelPos);
+
+
+    // // actually start game
+    // let winner;
+    // while(!winner) {
+    //   var timeleft = 10;
+    //   var downloadTimer = setInterval(function(){
+    //     if(timeleft <= 0){
+    //       clearInterval(downloadTimer);
+    //     }
+    //     document.getElementById("countdown").textContent = timeleft;
+    //     timeleft -= 1;
+    //   }, 1000);
+
+    //   let timeout = setTimeout()
+    // }
   }
 
   function moveCharacter(elemId, dx, dy) {
@@ -248,25 +266,42 @@
     elem.style.left = `${newCol * STEP}%`;
   }
 
-
-  // Handle key presses
-  document.addEventListener("keydown", (e) => {
-    switch (e.key) {
-      // Arrow keys for prisoner
-      case "ArrowUp":
-        socket.emit("prisoner move", {'dx': 0, 'dy': -1});
-        break;
-      case "ArrowDown":
-        socket.emit("prisoner move", {'dx': 0, 'dy': 1});
-        break;
-      case "ArrowLeft":
-        socket.emit("prisoner move", {'dx': -1, 'dy': 0});
-        break;
-      case "ArrowRight":
-        socket.emit("prisoner move", {'dx': 1, 'dy': 0});
-        break;
+  let keyEventHandler; // required for removeEventListener()
+  function enableMoveSelection(enable, character) {
+    if (enable) {
+      document.addEventListener("keydown", keyEventHandler = (e) => {
+        switch (e.key) {
+          // Arrow keys
+          case "ArrowUp":
+            socket.emit(`${character} select move`, {'dx': 0, 'dy': -1});
+            break;
+          case "ArrowDown":
+            socket.emit(`${character} select move`, {'dx': 0, 'dy': 1});
+            break;
+          case "ArrowLeft":
+            socket.emit(`${character} select move`, {'dx': -1, 'dy': 0});
+            break;
+          case "ArrowRight":
+            socket.emit(`${character} select move`, {'dx': 1, 'dy': 0});
+            break;
+        }
+      });
     }
-  });
+    else if(!enable) {
+      document.removeEventListener("keydown", keyEventHandler);
+    }
+  }
+
+  function startCountdown() {
+    var timeleft = 10;
+    var timer = setInterval(function(){
+      if(timeleft <= 0){
+        clearInterval(timer);
+      }
+      document.getElementById("countdown").textContent = timeleft;
+      timeleft -= 1;
+    }, 1000);
+  }
 
 
   // custom "namespace" to split logic of game IO from other IO
@@ -279,12 +314,24 @@
 
   // custom event, must be emitted by server to be activated
   socket.on("start game", (data) => {
-    gameStart(data.grid, data.obsPosArray, data.wardenPos, data.prisonerPos, data.tunnelPos);
+    gameStart(data.grid, data.obsPosArray, data.wardenPos, data.prisonerPos, data.tunnelPos, data.character);
+    document.getElementById("player character").textContent = `You are ${data.character}`
   });
 
-  socket.on("prisoner moved", ({dx, dy}) => {
-    moveCharacter("prisoner", dx, dy);
+  socket.on("turn start", (character) => {
+    console.log("turn start reached");
+    enableMoveSelection(true, character);
+    startCountdown();
   });
+
+  socket.on("turn end", (data) => {
+    console.log("turn end reached");
+    console.log(data)
+    enableMoveSelection(false, data.character);
+    if (data.dx !== null && data.dy !== null) {
+      moveCharacter(data.character, data.dx, data.dy);
+    }
+  })
 </script>
 
 </html>
