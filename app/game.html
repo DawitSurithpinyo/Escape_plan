@@ -183,7 +183,7 @@
       const result = gridInit();
       grid = result.grid;
       obsPos = result.obsPos;
-      warderPos = result.wardrnPos;
+      warderPos = result.warderPos;
       prisonerPos = result.prisonerPos;
       tunnelPos = result.tunnelPos;
     }
@@ -269,7 +269,12 @@
   let keyEventHandler; // required for removeEventListener()
   function enableMoveSelection(enable, character) {
     if (enable) {
-      document.addEventListener("keydown", keyEventHandler = (e) => {
+      // Remove any existing listener first
+      if (keyEventHandler) {
+        document.removeEventListener("keydown", keyEventHandler);
+      }
+
+      keyEventHandler = (e) => {
         switch (e.key) {
           // Arrow keys
           case "ArrowUp":
@@ -285,10 +290,12 @@
             socket.emit(`${character} select move`, {'dx': 1, 'dy': 0});
             break;
         }
-      });
+      }
+      document.addEventListener("keydown", keyEventHandler);
     }
     else if(!enable) {
       document.removeEventListener("keydown", keyEventHandler);
+      keyEventHandler = null;
     }
   }
 
