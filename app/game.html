@@ -247,7 +247,7 @@
     let row = Math.round(top / STEP);
     let col = Math.round(left / STEP);
 
-    const newRow = row + dy;
+    const newRow = row - dy;
     const newCol = col + dx;
 
     if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLS) return;
@@ -338,7 +338,6 @@
     console.log(data)
     enableMoveSelection(false, data.character);
     if (data.dx !== null && data.dy !== null) {
-      console.log("MOVE, BRO.");
       moveCharacter(data.character, data.dx, data.dy);
     }
   })
