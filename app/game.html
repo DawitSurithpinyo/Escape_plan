@@ -81,6 +81,11 @@
     outline: 3px solid limegreen;
     background-color: chartreuse;
   }
+  text{
+    display: block;
+    text-align: center;
+    font-weight: 300;
+  }
 
   .game_obj {
     /* images of warder, prisoner, obstacles, tunnel, etc. */
@@ -101,6 +106,22 @@
     /* left: 100%; */
     /* bottom: 20px; */
   }
+  .turn-timer {
+  width: 60%;
+  height: 12px;
+  margin: 12px auto 0;
+  background: #2e2e2e;
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, .4);
+}
+
+.turn-timer-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+}
+
 </style>
 
 <body>
@@ -153,8 +174,11 @@
           <div class="grid-cell" id="cell 24"></div>
         </div>
       </div>
-      <text id="countdown"></text>
-      <text id="player character"></text>
+      <text id="countdown" style="text-align: center;">Welcome!</text>
+      <div class="turn-timer">
+        <div class="turn-timer-bar" id="turnBar"></div>
+      </div>
+      <text id="player character" style="text-align: center;">Waiting for another player.</text>
     </div>
     <div class="column side" style="background-color: salmon">This is to the right</div>
   </div>
@@ -303,12 +327,20 @@
   }
 
   function startCountdown() {
+    const bar = document.getElementById("turnBar");
+    if (!bar) return;
+
+
     var timeleft = 10;
+    var total = timeleft;
+
     var timer = setInterval(function(){
       if(timeleft <= 0){
         clearInterval(timer);
       }
+      const percent = (timeleft/total) * 100;
       document.getElementById("countdown").textContent = timeleft;
+      bar.style.width = percent+"%"
       timeleft -= 1;
     }, 1000);
   }
