@@ -175,6 +175,7 @@
         </div>
       </div>
       <text id="countdown" style="text-align: center;">Welcome!</text>
+      <text id="movement" style="text-align: center;">Staying</text>
       <div class="turn-timer">
         <div class="turn-timer-bar" id="turnBar"></div>
       </div>
@@ -275,7 +276,7 @@
     const newRow = row - dy;
     const newCol = col + dx;
 
-    if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLS) return;
+    if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLS) return false;
 
     const targetCell = newRow * COLS + newCol;
 
@@ -290,12 +291,13 @@
       obstaclePositions.push(orow * COLS + ocol);
     }
 
-    if (obstaclePositions.includes(targetCell)) return;
+    if (obstaclePositions.includes(targetCell)) return false;
     
     console.log(elem.style.top);
     elem.style.top = `${newRow * STEP}%`;
     elem.style.left = `${newCol * STEP}%`;
     console.log(elem.style.top);
+    return true;
   }
 
   let keyEventHandler; // required for removeEventListener()
@@ -314,7 +316,7 @@
           const dir = {
             ArrowUp: {dx:0,dy:1}, ArrowDown: {dx:0,dy:-1}, ArrowLeft: {dx:-1,dy:0}, ArrowRight: {dx:1,dy:0}
           }[e.key];
-
+          document.getElementById("movement").textContent = "you pressed " + e.key
           socket.emit(`${character} select move`, dir);
         }
       };
@@ -368,12 +370,22 @@
 
   socket.on("turn end", (data) => {
     console.log(`${data.character}'s turn has ended.`);
-    console.log(data)
+    console.log(data);
     enableMoveSelection(false, data.character);
     if (data.dx !== null && data.dy !== null) {
-      moveCharacter(data.character, data.dx, data.dy);
+      if(moveCharacter(data.character, data.dx, data.dy)){
+        socket.emit("move", data.dx, data.dy)
+      }
+      else{
+        socket.emit("move", 0,0)
+      }
     }
   })
+
+  socket.on("game over", (winner) =>{
+    window.alert(`${winner} win`);
+    console.log(`${winner} win`);
+  });
 </script>
 
 </html>
