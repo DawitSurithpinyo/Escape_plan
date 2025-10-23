@@ -182,6 +182,7 @@
       <text id="player character" style="text-align: center;">Waiting for another player.</text>
     </div>
     <div class="column side" style="background-color: salmon">This is to the right</div>
+    <p>Players online: <span id="playerOnline">0</span></p>
   </div>
   <!-- <div class="full-screen-div">The watcher</div> -->
 </body>
@@ -291,6 +292,16 @@
       obstaclePositions.push(orow * COLS + ocol);
     }
 
+    //preventing warder from taking tunnel
+    //Broken, fix this
+    const tun = document.getElementById("tunnel");
+    if (tun){
+      const tunOT = parseFloat(tun.style.top) || 0;
+      const tunOL = parseFloat(tun.style.left) || 0;
+      const tunRow = Math.round(tunOT / STEP);
+      const tunCol = Math.round(tunOL / STEP);
+      const tunnelPositions = (tunRow * COLS + tunCol);
+      if (tunnelPositions == targetCell && elemID=="warder")return false;};
     if (obstaclePositions.includes(targetCell)) return false;
     
     console.log(elem.style.top);
@@ -350,6 +361,12 @@
 
   // custom "namespace" to split logic of game IO from other IO
   const socket = io("/game");
+
+  // player count identifier
+  socket.on("server:updateOnline", ({ online }) => {
+    const el = document.getElementById("playerOnline");
+    if (el) el.textContent = online;
+  });
 
   // "connect" is a built-in event in socket.io. It's auto called every time browser's socket connects successfully
   socket.on("connect", () => {

@@ -28,7 +28,7 @@
   <body>
     <div class ="row">
       <div class = "column left" style="background-color:#aaa;">
-        <h1>players</h1> <h1 id = "player2">0</h1>
+        <p>Players online: <span id="playerOnline">0</span></p>
         <h1 id = "username">Username : </h1>
         <form id="form1" action="">
           <input id="name" autocomplete="off" /><button>Confirm</button></form>
@@ -60,6 +60,10 @@
       const input = document.getElementById('input');
       const messages = document.getElementById('messages');
 
+      socket.on("server:updateOnline", ({ online }) => {
+        const el = document.getElementById("playerOnline");
+        if (el) el.textContent = online;
+      });
 
       form1.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -105,10 +109,13 @@
         item.style.fontWeight = "bold";
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
-      })
+      });
       socket.on('set name',(name) => {
         console.log(name);
-      })
+      });
+      socket.on('playercount',(number) => {
+        document.getElementById('player2').textContent = number
+      });
     </script>
   </body>
 </html>
