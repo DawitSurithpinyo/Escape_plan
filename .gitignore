@@ -1,0 +1,22 @@
+# local git bundle backup
+*.bundle
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+*.env
+.env.*
+
+# typescript
+*.tsbuildinfo
+
+# dependencies
+node_modules/
