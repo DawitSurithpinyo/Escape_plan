@@ -403,6 +403,11 @@
     window.alert(`${winner} win`);
     console.log(`${winner} win`);
   });
+  socket.on("reset:all", () => {
+  console.log("Server requested full reset");
+  alert("Game has been reset by admin!");
+  window.location.href = "/"; // go back to home page
+});
 </script>
 
 </html>
