@@ -79,8 +79,8 @@
 
   .moveindic{
      border: 1px solid black;
-     height: 150px;
-     width:150px;
+     height: 130px;
+     width:130px;
      margin: 10px;
   }
 
@@ -108,6 +108,20 @@
     /* transform: translate(-50%); */
     /* left: 100%; */
     /* bottom: 20px; */
+   }
+
+   .belowgrid{
+    margin:5%;
+    display: flex;
+    border:1px solid black
+   }
+   .belowleft{
+    width: 70%;
+    margin: 0
+   }
+   .belowright{
+    width: 30%;
+    margin: 0
    }
    .turn-timer {
     width: 60%;
@@ -198,13 +212,16 @@
           <div class="grid-cell" id="cell 24"></div>
         </div>
       </div>
-      <text id="countdown" style="text-align: center;">Welcome!</text>
+      <div class="belowgrid">
+        <div class = "belowleft"><text id="countdown" style="text-align: center;">Welcome!</text>
       <text id="movement" style="text-align: center;">Staying</text>
       <div class="turn-timer">
         <div class="turn-timer-bar" id="turnBar"></div>
       </div>
-      <text id="player character" style="text-align: center;">Waiting for another player.</text>
-      <img src="../assets/arrow/idlew.png" id="moveindic" class ="moveindic">
+      <text id="player character" style="text-align: center;">Waiting for another player.</text></div>
+        <div class = "belowright"><img src="../assets/arrow/idlew.png" id="moveindic" class ="moveindic"></div>
+      </div>
+
     </div>
     <div class="column side" style="background-color: salmon">
       <div class = "playerbox">
