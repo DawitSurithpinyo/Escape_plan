@@ -416,6 +416,24 @@
     }, 1000);
   }
 
+  async function getUserInfo() {
+    const res = await fetch('/api/getUser', {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (res.ok) {
+      console.log(res.json());
+      // TODO: display user info on page as proper leaderboard
+    }
+  }
+
+
+  // upon landing, fetch user info
+  await getUserInfo();
 
   // custom "namespace" to split logic of game IO from other IO
   const socket = io("/game");

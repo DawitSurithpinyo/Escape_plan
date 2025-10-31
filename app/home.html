@@ -47,6 +47,8 @@
             <input id="special" autocomplete="off"/><button>Special</button>
           </form>
         </div> -->
+
+      <div id="test users"></div>
     </div>
     
     <script src="/socket.io/socket.io.js"></script>
@@ -60,18 +62,57 @@
       const input = document.getElementById('input');
       const messages = document.getElementById('messages');
 
+      async function getAllUsers() {
+        const res = await fetch("/api/getAllUser", {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (res.ok) {
+          return await res.json();
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", async () => {
+        await new Promise(r => setTimeout(r, 100)); // delay to make sure cookies arrive first
+        const allUsers = await getAllUsers();
+        for (let [key, value] of Object.entries(allUsers)) {
+          document.getElementById("test users").innerHTML += `<li">userID: ${key}</li>`;
+          document.getElementById("test users").innerHTML += `<li>userName: ${value.userName}</li>`;
+          document.getElementById("test users").innerHTML += `<li>win: ${value.win}</li>`;
+          document.getElementById("test users").innerHTML += `<li>lose: ${value.lose}</li>`;
+        };
+        document.getElementById("test users").innerHTML += `<ul>`;
+      });
+
+
       socket.on("server:updateOnline", ({ online }) => {
         const el = document.getElementById("playerOnline");
         if (el) el.textContent = online;
       });
 
-      form1.addEventListener('submit', (e) => {
+      form1.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (name.value) {
           username.innerHTML="Username : "+name.value;
           console.log("Username set.");
           socket.emit('status message',name.value);
           //socket.emit('chat message', "yooooooooooooooo");
+
+          await fetch('/api/setUsername', {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              userName: name.value
+            })
+          })
+
           name.value = '';
         }
       });
