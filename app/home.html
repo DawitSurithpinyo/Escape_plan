@@ -7,13 +7,13 @@
       body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
       /* .column {float: left; padding: 10px; height:100%} */
-
       .left {width: 25%;}
       .right {width: 75%;}
       body{ border: 1px solid red}
       .row{display:flex; height:100% ; border:1px solid blue}
       .column{ border: 1px solid black; }
-      /* .row:after {content: "";display: table;clear: both} */
+
+      /* chat input bar */
       #form { background: rgba(99, 74, 74, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
       #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
       #input:focus { outline: none; }
@@ -22,7 +22,39 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages > li { padding: 0.5rem 1rem; }
       #messages > li:nth-child(odd) { background: #efefef; }
-      .button {background-color: #4CAF50; /* Green */color: white;width: 100%;border-radius: 8px;border: none;padding: 10px;margin-top: 10px;font-size: 16px;cursor: pointer;}
+      .button {background-color: #4CAF50; color: white;width: 100%;border-radius: 8px;border: none;padding: 10px;margin-top: 10px;font-size: 16px;cursor: pointer;}
+
+      /* === Players UI (inside #test users) === */
+      #test\ users { padding: 10px; }
+      .players-header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:8px 0 6px; }
+      .players-header h3 { margin:0; font-size:16px; }
+      .players-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:10px; }
+      .player-card {
+        background:#fff; border:1px solid #ddd; border-radius:10px; padding:10px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      }
+      .player-top { display:flex; align-items:center; gap:10px; }
+      .avatar {
+        width:36px; height:36px; border-radius:999px; display:flex; align-items:center; justify-content:center;
+        background:#f3f4f6; font-weight:600; border:1px solid #e5e7eb;
+      }
+      .name { font-weight:600; }
+      .userid { font-size:12px; color:#666; word-break:break-all; }
+      .stats { margin-top:8px; font-size:13px; color:#333; display:flex; gap:12px; }
+      .chip {
+        display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #e5e7eb; background:#f9fafb;
+      }
+      .chip.warder { background:#eef6ff; border-color:#cfe3ff; }
+      .chip.prisoner { background:#fff2ee; border-color:#ffd6cc; }
+      .muted { color:#777; }
+      .pill { font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid #e5e7eb; background:#fafafa; }
+      .toolbar { display:flex; gap:8px; align-items:center; }
+      .toolbar input {
+        height:28px; padding:0 8px; border:1px solid #ddd; border-radius:6px; font-size:13px; width: 160px;
+      }
+      .toolbar button {
+        height:28px; padding:0 10px; border:1px solid #ddd; background:#fff; border-radius:6px; cursor:pointer; font-size:13px;
+      }
     </style>
   </head>
   <body>
@@ -35,18 +67,16 @@
           <button id="gamebutton" class="button">Play</button>
       </div>
 
-
       <div class = "column right">
         <ul id="messages"></ul>
-        </div>
+      </div>
+
       <form id="form" action="">
-          <input id="input" autocomplete="off" /><button>Send</button>
-        </form>
-        <!-- <div class = "special column">
-          <form id="form0">
-            <input id="special" autocomplete="off"/><button>Special</button>
-          </form>
-        </div> -->
+        <input id="input" autocomplete="off" /><button>Send</button>
+      </form>
+
+      <!-- Players panel -->
+      <div id="test users"></div>
     </div>
     
     <script src="/socket.io/socket.io.js"></script>
@@ -60,45 +90,135 @@
       const input = document.getElementById('input');
       const messages = document.getElementById('messages');
 
+      async function getAllUsers() {
+        const res = await fetch("/api/getAllUser", {
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" }
+        });
+        if (res.ok) return await res.json();
+        return {};
+      }
+
+      function renderPlayers(allUsers) {
+        const container = document.getElementById("test users");
+        if (!container) return;
+
+        const players = Object.entries(allUsers || {}).map(([id, u]) => ({
+          id,
+          userName: (u?.userName && u.userName.trim()) ? u.userName.trim() : "(guest)",
+          win: u?.win ?? 0,
+          lose: u?.lose ?? 0,
+          role: u?.roleCurrentGame ?? null
+        }));
+
+        // UI: header + controls (search, manual refresh)
+        let html = `
+          <div class="players-header">
+            <h3>All Players <span class="pill">${players.length}</span></h3>
+            <div class="toolbar">
+              <input id="playerSearch" type="search" placeholder="Search name/ID"/>
+              <button id="refreshBtn" type="button">Refresh</button>
+            </div>
+          </div>
+        `;
+
+        // grid of cards
+        html += `<div class="players-grid" id="playersGrid"></div>`;
+        container.innerHTML = html;
+
+        // filtering
+        const grid = document.getElementById("playersGrid");
+        const searchEl = document.getElementById("playerSearch");
+        const draw = () => {
+          const q = (searchEl?.value || "").toLowerCase();
+          const list = players
+            .filter(p => !q || p.userName.toLowerCase().includes(q) || p.id.toLowerCase().includes(q))
+            // sort by wins desc for nice reading; remove if you want original order
+            .sort((a,b) => b.win - a.win);
+
+          grid.innerHTML = list.map(p => `
+            <div class="player-card">
+              <div class="player-top">
+                <div class="avatar">${p.userName === "(guest)" ? "G" : p.userName[0].toUpperCase()}</div>
+                <div>
+                  <div class="name">${p.userName}</div>
+                  <div class="userid">${p.id}</div>
+                </div>
+              </div>
+              <div class="stats">
+                <span>🏆 <strong>${p.win}</strong> wins</span>
+                <span>💥 <strong>${p.lose}</strong> loses</span>
+              </div>
+              <div style="margin-top:8px;">
+                <span class="chip ${p.role === 'warder' ? 'warder' : p.role === 'prisoner' ? 'prisoner' : ''}">
+                  ${p.role ? `Role: ${p.role}` : 'Role: —'}
+                </span>
+              </div>
+            </div>
+          `).join("");
+        };
+
+        draw();
+        searchEl?.addEventListener("input", draw);
+        document.getElementById("refreshBtn")?.addEventListener("click", async () => {
+          await refreshPlayers();
+        });
+      }
+
+      async function refreshPlayers() {
+        const all = await getAllUsers();
+        renderPlayers(all);
+      }
+
+      // initial load + auto refresh
+      window.addEventListener("DOMContentLoaded", async () => {
+        await new Promise(r => setTimeout(r, 100)); // wait for cookie
+        await refreshPlayers();
+        setInterval(refreshPlayers, 5000);
+      });
+
       socket.on("server:updateOnline", ({ online }) => {
         const el = document.getElementById("playerOnline");
         if (el) el.textContent = online;
       });
 
-      form1.addEventListener('submit', (e) => {
+      form1.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (name.value) {
-          username.innerHTML="Username : "+name.value;
-          console.log("Username set.");
-          socket.emit('status message',name.value);
-          //socket.emit('chat message', "yooooooooooooooo");
+          username.innerHTML = "Username : " + name.value;
+          socket.emit('status message', name.value);
+          await fetch('/api/setUsername', {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userName: name.value })
+          });
           name.value = '';
+          // quick refresh to reflect new name
+          refreshPlayers();
         }
       });
 
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         if (input.value) {
-         // console.log(input.value)
           socket.emit('chat message', input.value);
-          //socket.emit('chat message', "yooooooooooooooo");
           input.value = '';
         }
       });
 
       const gamebutton = document.getElementById('gamebutton');
-
       gamebutton.addEventListener('click', (e) => {
         e.preventDefault();
-        const currentUser = username.textContent
-        socket.emit('game start', currentUser)
-        window.location.href = "/game"
+        const currentUser = username.textContent;
+        socket.emit('game start', currentUser);
+        window.location.href = "/game";
       });
 
       socket.on('chat message', (msg) => {
         const item = document.createElement('li');
         item.textContent = msg;
-        // item.textContent = "Test";
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       });
@@ -110,11 +230,14 @@
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       });
+
       socket.on('set name',(name) => {
         console.log(name);
       });
+
       socket.on('playercount',(number) => {
-        document.getElementById('player2').textContent = number
+        const el = document.getElementById('player2');
+        if (el) el.textContent = number;
       });
     </script>
   </body>
