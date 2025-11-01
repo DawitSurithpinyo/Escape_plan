@@ -4,14 +4,14 @@ const { createServer } = require('node:http');
 const { join } = require('node:path');
 const { Server } = require('socket.io');
 const { gameIO } = require('./lib/game.js');
-var cookieParser = require('cookie-parser')
+var cookieParser = require('cookie-parser');
+
+const sessions = require('./util/sessions.js');
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
-
-const sessions = {};
 
 app.use(express.static(__dirname));
 app.use(express.json()); // to parse JSON in requests
@@ -19,7 +19,7 @@ app.use(cookieParser()); // to read/write cookies in requests
 
 app.get('/', (req, res) => {
   let reqUserID = req.cookies.userID;
-  if(sessions.hasOwnProperty(reqUserID)){
+  if(reqUserID && sessions.hasOwnProperty(reqUserID)){
     res.sendFile(join(__dirname, 'app/home.html'));
     return;
   }
@@ -32,8 +32,8 @@ app.get('/', (req, res) => {
     userName: null, // username, set in home page
     win: 0, // how many times player has won
     lose: 0,
-    roleCurrentGame: null // to record what role (warder/prisoner) this user has in the current game, 
-    // so that if player disconnect, we know whether to decrement prisoner or warder count in the server page
+    socketID: null, // current socket ID of user. Used to identify user during game since game initialization logic (who plays what role) uses socket object
+    wonLastRound: false // player won last round get to move first in next game (as specified in requirement)
   };
 
   res.sendFile(join(__dirname, 'app/home.html'));
