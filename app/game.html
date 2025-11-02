@@ -227,8 +227,8 @@
       <div class = "playerbox">
         <div class ="playercount">Players online: <span id="playerOnline">0</span></div>
         <div class="row">
-          <div class="column side playerindiv">Player 1</div>
-          <div class="column side playerindiv">Player 2</div>
+          <div class="column side playerindiv" id="player1-box"></div>
+          <div class="column side playerindiv" id="player2-box"></div>
         </div>
       </div>
       <div class="chatbox">Chatbox here</div>
@@ -426,8 +426,7 @@
     });
 
     if (res.ok) {
-      console.log(res.json());
-      // TODO: display user info on page as proper leaderboard
+      return await res.json();
     }
   }
 
@@ -447,6 +446,35 @@
   // "connect" is a built-in event in socket.io. It's auto called every time browser's socket connects successfully
   socket.on("connect", () => {
     console.log("Connected to game namespace");
+    // let user = await getUserInfo();
+    // var playerBox = document.getElementById("player1-box");
+    // if (playerBox.textContent.trim() !== "") {
+    //   playerBox = document.getElementById("player2-box");
+    // }
+    // playerBox.innerHTML += `
+    //   <text>Player: ${user.userName}</text>
+    //   <text>Win count: ${user.win}</text>
+    //   <text>Lose count: ${user.lose}</text>`
+  });
+
+  socket.on("first player", (player) => {
+    document.getElementById("player1-box").innerHTML += `
+      <text>Player: ${player.userName}</text>
+      <text>Win count: ${player.win}</text>
+      <text>Lose count: ${player.lose}</text>`;
+  });
+
+  socket.on("both players", (players) => {
+    const [p1, p2] = players;
+    document.getElementById("player1-box").innerHTML = `
+      <text>${p1.userName}</text>
+      <text>win count: ${p1.win}</text>
+      <text>lose count: ${p1.lose}</text>`;
+
+    document.getElementById("player2-box").innerHTML = `
+      <text>${p2.userName}</text>
+      <text>win count: ${p2.win}</text>
+      <text>lose count: ${p2.lose}</text>`;
   });
 
   // custom event, must be emitted by server to be activated

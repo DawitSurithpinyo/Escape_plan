@@ -33,7 +33,8 @@ app.get('/', (req, res) => {
     win: 0, // how many times player has won
     lose: 0,
     socketID: null, // current socket ID of user. Used to identify user during game since game initialization logic (who plays what role) uses socket object
-    wonLastRound: false // player won last round get to move first in next game (as specified in requirement)
+    wonLastRound: false, // player won last round get to move first in next game (as specified in requirement)
+    roleCurrentGame: null
   };
 
   res.sendFile(join(__dirname, 'app/home.html'));

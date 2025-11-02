@@ -100,7 +100,17 @@
         return {};
       }
 
-      function renderPlayers(allUsers) {
+      async function getUser() {
+        const res = await fetch("/api/getUser", {
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" }
+        });
+        if (res.ok) return await res.json();
+        return {};
+      }
+
+      async function renderPlayers(allUsers) {
         const container = document.getElementById("test users");
         if (!container) return;
 
@@ -111,6 +121,10 @@
           lose: u?.lose ?? 0,
           role: u?.roleCurrentGame ?? null
         }));
+
+        // Display user's own username on the "Username : " div
+        const thisUser = await getUser();
+        username.innerHTML = "Username : " + (thisUser.userName ?? "");
 
         // UI: header + controls (search, manual refresh)
         let html = `
@@ -168,8 +182,14 @@
 
       async function refreshPlayers() {
         const all = await getAllUsers();
-        renderPlayers(all);
+        await renderPlayers(all);
       }
+
+      // Listen for score reset events from server
+      socket.on("admin:reset", () => {
+        console.log("Scores reset by admin - refreshing leaderboard");
+        refreshPlayers();
+      });
 
       // initial load + auto refresh
       window.addEventListener("DOMContentLoaded", async () => {
