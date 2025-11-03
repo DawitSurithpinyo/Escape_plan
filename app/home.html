@@ -1,133 +1,373 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Socket.IO chat</title>
-    <style>
-      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-      /* .column {float: left; padding: 10px; height:100%} */
-      .left {width: 25%;}
-      .right {width: 75%;}
-      body{ border: 1px solid red}
-      .row{display:flex; height:100% ; border:1px solid blue}
-      .column{ border: 1px solid black; }
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Socket.IO chat</title>
+  <style>
+    body {
+      margin: 0;
+      padding-bottom: 3rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* .column {float: left; padding: 10px; height:100%} */
+    .left {
+      width: 25%;
+    }
+
+    .right {
+      width: 75%;
+    }
+
+    body {
+      background-color: whitesmoke;
+    }
+
+    body.dark-mode {
+      background-color: #333;
+    }
+
+    .row {
+      display: flex;
+      height: 100%;
+    }
+
+    /*.column{ }
 
       /* chat input bar */
-      #form { background: rgba(99, 74, 74, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
-      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
-      #input:focus { outline: none; }
-      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+    #form {
+      background: rgba(99, 74, 74, 0.15);
+      padding: 0.25rem;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      height: 3rem;
+      box-sizing: border-box;
+      backdrop-filter: blur(10px);
+    }
 
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages > li { padding: 0.5rem 1rem; }
-      #messages > li:nth-child(odd) { background: #efefef; }
-      .button {background-color: #4CAF50; color: white;width: 100%;border-radius: 8px;border: none;padding: 10px;margin-top: 10px;font-size: 16px;cursor: pointer;}
+    #input {
+      border: none;
+      padding: 0 1rem;
+      flex-grow: 1;
+      border-radius: 2rem;
+      margin: 0.25rem;
+    }
 
-      /* === Players UI (inside #test users) === */
-      #test\ users { padding: 10px; }
-      .players-header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:8px 0 6px; }
-      .players-header h3 { margin:0; font-size:16px; }
-      .players-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:10px; }
-      .player-card {
-        background:#fff; border:1px solid #ddd; border-radius:10px; padding:10px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-      }
-      .player-top { display:flex; align-items:center; gap:10px; }
-      .avatar {
-        width:36px; height:36px; border-radius:999px; display:flex; align-items:center; justify-content:center;
-        background:#f3f4f6; font-weight:600; border:1px solid #e5e7eb;
-      }
-      .name { font-weight:600; }
-      .userid { font-size:12px; color:#666; word-break:break-all; }
-      .stats { margin-top:8px; font-size:13px; color:#333; display:flex; gap:12px; }
-      .chip {
-        display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #e5e7eb; background:#f9fafb;
-      }
-      .chip.warder { background:#eef6ff; border-color:#cfe3ff; }
-      .chip.prisoner { background:#fff2ee; border-color:#ffd6cc; }
-      .muted { color:#777; }
-      .pill { font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid #e5e7eb; background:#fafafa; }
-      .toolbar { display:flex; gap:8px; align-items:center; }
-      .toolbar input {
-        height:28px; padding:0 8px; border:1px solid #ddd; border-radius:6px; font-size:13px; width: 160px;
-      }
-      .toolbar button {
-        height:28px; padding:0 10px; border:1px solid #ddd; background:#fff; border-radius:6px; cursor:pointer; font-size:13px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class ="row">
-      <div class = "column left" style="background-color:#aaa;">
-        <p>Players online: <span id="playerOnline">0</span></p>
-        <h1 id = "username">Username : </h1>
-        <form id="form1" action="">
-          <input id="name" autocomplete="off" /><button>Confirm</button></form>
-          <button id="gamebutton" class="button">Play</button>
-      </div>
+    #input:focus {
+      outline: none;
+    }
 
-      <div class = "column right">
-        <ul id="messages"></ul>
-      </div>
+    #form>button {
+      background: #333;
+      border: none;
+      padding: 0 1rem;
+      margin: 0.25rem;
+      border-radius: 3px;
+      outline: none;
+      color: #fff;
+    }
 
-      <form id="form" action="">
-        <input id="input" autocomplete="off" /><button>Send</button>
-      </form>
+    #messages {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
 
-      <!-- Players panel -->
-      <div id="test users"></div>
-    </div>
+    #messages>li {
+      padding: 0.5rem 1rem;
+    }
+
+    #messages>li:nth-child(odd) {
+      background: #efefef;
+    }
+
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      width: 90%;
+      border-radius: 8px;
+      border: none;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* === Players UI (inside #test users) === */
+    #test\ users {
+      padding: 10px;
+    }
+
+    .players-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 8px 0 6px;
+    }
+
+    .players-header h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .players-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+    }
+
+    .player-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+
+    .player-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f3f4f6;
+      font-weight: 600;
+      border: 1px solid #e5e7eb;
+    }
+
+    .name {
+      font-weight: 600;
+    }
+
+    .userid {
+      font-size: 12px;
+      color: #666;
+      word-break: break-all;
+    }
+
+    .stats {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #333;
+      display: flex;
+      gap: 12px;
+    }
+
+    .chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+
+    .chip.warder {
+      background: #eef6ff;
+      border-color: #cfe3ff;
+    }
+
+    .chip.prisoner {
+      background: #fff2ee;
+      border-color: #ffd6cc;
+    }
+
+    .muted {
+      color: #777;
+    }
+
+    .pill {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #fafafa;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .toolbar input {
+      height: 28px;
+      padding: 0 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      width: 160px;
+    }
+
+    .toolbar button {
+      height: 28px;
+      padding: 0 10px;
+      border: 1px solid #ddd;
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    /* ---------- DARK MODE THEME OVERRIDES ---------- */
+    body.dark-mode {
+      background-color: #1a1b1e;
+      color: #e6e9ef;
+    }
+
+    body.dark-mode #form {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    body.dark-mode #input {
+      background: #2a2b2f;
+      color: #e6e9ef;
+      border: 1px solid #444;
+    }
+
+    body.dark-mode #form>button {
+      background: #666;
+      color: white;
+    }
+
+    body.dark-mode #messages>li:nth-child(odd) {
+      background: #2a2b2f;
+    }
+
+    body.dark-mode #messages>li:nth-child(even) {
+      background: #232427;
+    }
+
+    body.dark-mode .player-card {
+      background: #22252a;
+      border-color: #33373d;
+      box-shadow: none;
+    }
+
+    body.dark-mode .pill {
+      background: #22252a;
+    }
+
+    body.dark-mode .avatar {
+      background: #3a3d42;
+      border-color: #555;
+    }
+
+    body.dark-mode .userid,
+    body.dark-mode .muted {
+      color: #aaa;
+    }
+
+    body.dark-mode input{
+      background: #2d2f33;
+      color: #e6e9ef;
+      border-color: #444;
+    }
     
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      const socket = io();
-      const username = document.getElementById('username');
-      const form1 = document.getElementById('form1');
-      const name = document.getElementById('name');
+    body.dark-mode .chip{
+      background-color: #1a1b1e;
+    }
 
-      const form = document.getElementById('form');
-      const input = document.getElementById('input');
-      const messages = document.getElementById('messages');
+    body.dark-mode .chip.warder {
+      background: #334155;
+      border-color: #475569;
+    }
 
-      async function getAllUsers() {
-        const res = await fetch("/api/getAllUser", {
-          method: "GET",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" }
-        });
-        if (res.ok) return await res.json();
-        return {};
-      }
+    body.dark-mode .chip.prisoner {
+      background: #4b3830;
+      border-color: #6b4b42;
+    }
+  </style>
+</head>
 
-      async function getUser() {
-        const res = await fetch("/api/getUser", {
-          method: "GET",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" }
-        });
-        if (res.ok) return await res.json();
-        return {};
-      }
+<body>
 
-      async function renderPlayers(allUsers) {
-        const container = document.getElementById("test users");
-        if (!container) return;
+  <div class="row">
 
-        const players = Object.entries(allUsers || {}).map(([id, u]) => ({
-          id,
-          userName: (u?.userName && u.userName.trim()) ? u.userName.trim() : "(guest)",
-          win: u?.win ?? 0,
-          lose: u?.lose ?? 0,
-          role: u?.roleCurrentGame ?? null
-        }));
 
-        // Display user's own username on the "Username : " div
-        const thisUser = await getUser();
-        username.innerHTML = "Username : " + (thisUser.userName ?? "");
+    <div class="column left" style="background-color:#aaa;">
+      <button id="themeToggle" style="background:#444;">🌙</button>
+      <p>Players online: <span id="playerOnline">0</span></p>
+      <h1 id="username">Username : </h1>
+      <form id="form1" action="">
+        <input id="name" autocomplete="off" /><button>Confirm</button>
+      </form>
+      <button id="gamebutton" class="button">Play</button>
+    </div>
 
-        // UI: header + controls (search, manual refresh)
-        let html = `
+    <div class="column right">
+      <ul id="messages"></ul>
+    </div>
+
+    <form id="form" action="">
+      <input id="input" autocomplete="off" /><button>Send</button>
+    </form>
+
+    <!-- Players panel -->
+    <div id="test users"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const username = document.getElementById('username');
+    const form1 = document.getElementById('form1');
+    const name = document.getElementById('name');
+
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+    const messages = document.getElementById('messages');
+
+    async function getAllUsers() {
+      const res = await fetch("/api/getAllUser", {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" }
+      });
+      if (res.ok) return await res.json();
+      return {};
+    }
+
+    async function getUser() {
+      const res = await fetch("/api/getUser", {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" }
+      });
+      if (res.ok) return await res.json();
+      return {};
+    }
+
+    async function renderPlayers(allUsers) {
+      const container = document.getElementById("test users");
+      if (!container) return;
+
+      const players = Object.entries(allUsers || {}).map(([id, u]) => ({
+        id,
+        userName: (u?.userName && u.userName.trim()) ? u.userName.trim() : "(guest)",
+        win: u?.win ?? 0,
+        lose: u?.lose ?? 0,
+        role: u?.roleCurrentGame ?? null
+      }));
+
+      // Display user's own username on the "Username : " div
+      const thisUser = await getUser();
+      username.innerHTML = "Username : " + (thisUser.userName ?? "");
+
+      // UI: header + controls (search, manual refresh)
+      let html = `
           <div class="players-header">
             <h3>All Players <span class="pill">${players.length}</span></h3>
             <div class="toolbar">
@@ -137,21 +377,21 @@
           </div>
         `;
 
-        // grid of cards
-        html += `<div class="players-grid" id="playersGrid"></div>`;
-        container.innerHTML = html;
+      // grid of cards
+      html += `<div class="players-grid" id="playersGrid"></div>`;
+      container.innerHTML = html;
 
-        // filtering
-        const grid = document.getElementById("playersGrid");
-        const searchEl = document.getElementById("playerSearch");
-        const draw = () => {
-          const q = (searchEl?.value || "").toLowerCase();
-          const list = players
-            .filter(p => !q || p.userName.toLowerCase().includes(q) || p.id.toLowerCase().includes(q))
-            // sort by wins desc for nice reading; remove if you want original order
-            .sort((a,b) => b.win - a.win);
+      // filtering
+      const grid = document.getElementById("playersGrid");
+      const searchEl = document.getElementById("playerSearch");
+      const draw = () => {
+        const q = (searchEl?.value || "").toLowerCase();
+        const list = players
+          .filter(p => !q || p.userName.toLowerCase().includes(q) || p.id.toLowerCase().includes(q))
+          // sort by wins desc for nice reading; remove if you want original order
+          .sort((a, b) => b.win - a.win);
 
-          grid.innerHTML = list.map(p => `
+        grid.innerHTML = list.map(p => `
             <div class="player-card">
               <div class="player-top">
                 <div class="avatar">${p.userName === "(guest)" ? "G" : p.userName[0].toUpperCase()}</div>
@@ -171,94 +411,106 @@
               </div>
             </div>
           `).join("");
-        };
+      };
 
-        draw();
-        searchEl?.addEventListener("input", draw);
-        document.getElementById("refreshBtn")?.addEventListener("click", async () => {
-          await refreshPlayers();
-        });
-      }
-
-      async function refreshPlayers() {
-        const all = await getAllUsers();
-        await renderPlayers(all);
-      }
-
-      // Listen for score reset events from server
-      socket.on("admin:reset", () => {
-        console.log("Scores reset by admin - refreshing leaderboard");
-        refreshPlayers();
-      });
-
-      // initial load + auto refresh
-      window.addEventListener("DOMContentLoaded", async () => {
-        await new Promise(r => setTimeout(r, 100)); // wait for cookie
+      draw();
+      searchEl?.addEventListener("input", draw);
+      document.getElementById("refreshBtn")?.addEventListener("click", async () => {
         await refreshPlayers();
-        setInterval(refreshPlayers, 5000);
       });
+    }
 
-      socket.on("server:updateOnline", ({ online }) => {
-        const el = document.getElementById("playerOnline");
-        if (el) el.textContent = online;
-      });
+    async function refreshPlayers() {
+      const all = await getAllUsers();
+      await renderPlayers(all);
+    }
 
-      form1.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (name.value) {
-          username.innerHTML = "Username : " + name.value;
-          socket.emit('status message', name.value);
-          await fetch('/api/setUsername', {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userName: name.value })
-          });
-          name.value = '';
-          // quick refresh to reflect new name
-          refreshPlayers();
-        }
-      });
+    // Listen for score reset events from server
+    socket.on("admin:reset", () => {
+      console.log("Scores reset by admin - refreshing leaderboard");
+      refreshPlayers();
+    });
 
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (input.value) {
-          socket.emit('chat message', input.value);
-          input.value = '';
-        }
-      });
+    // initial load + auto refresh
+    window.addEventListener("DOMContentLoaded", async () => {
+      await new Promise(r => setTimeout(r, 100)); // wait for cookie
+      await refreshPlayers();
+      setInterval(refreshPlayers, 5000);
+    });
 
-      const gamebutton = document.getElementById('gamebutton');
-      gamebutton.addEventListener('click', (e) => {
-        e.preventDefault();
-        const currentUser = username.textContent;
-        socket.emit('game start', currentUser);
-        window.location.href = "/game";
-      });
+    socket.on("server:updateOnline", ({ online }) => {
+      const el = document.getElementById("playerOnline");
+      if (el) el.textContent = online;
+    });
 
-      socket.on('chat message', (msg) => {
-        const item = document.createElement('li');
-        item.textContent = msg;
-        messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
-      });
+    form1.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (name.value) {
+        username.innerHTML = "Username : " + name.value;
+        socket.emit('status message', name.value);
+        await fetch('/api/setUsername', {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userName: name.value })
+        });
+        name.value = '';
+        // quick refresh to reflect new name
+        refreshPlayers();
+      }
+    });
 
-      socket.on('status message',(msg) => {
-        const item = document.createElement('li');
-        item.textContent = msg;
-        item.style.fontWeight = "bold";
-        messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
-      });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (input.value) {
+        socket.emit('chat message', input.value);
+        input.value = '';
+      }
+    });
 
-      socket.on('set name',(name) => {
-        console.log(name);
-      });
+    const gamebutton = document.getElementById('gamebutton');
+    gamebutton.addEventListener('click', (e) => {
+      e.preventDefault();
+      const currentUser = username.textContent;
+      socket.emit('game start', currentUser);
+      window.location.href = "/game";
+    });
 
-      socket.on('playercount',(number) => {
-        const el = document.getElementById('player2');
-        if (el) el.textContent = number;
-      });
-    </script>
-  </body>
+    socket.on('chat message', (msg) => {
+      const item = document.createElement('li');
+      item.textContent = msg;
+      messages.appendChild(item);
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+
+    socket.on('status message', (msg) => {
+      const item = document.createElement('li');
+      item.textContent = msg;
+      item.style.fontWeight = "bold";
+      messages.appendChild(item);
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+
+    socket.on('set name', (name) => {
+      console.log(name);
+    });
+
+    socket.on('playercount', (number) => {
+      const el = document.getElementById('player2');
+      if (el) el.textContent = number;
+    });
+
+    const saved = localStorage.getItem("theme");
+    if(saved == "dark") document.body.classList.add("dark-mode");
+
+    const toggleBtn = document.getElementById("themeToggle");
+    toggleBtn.addEventListener("click",()=>{
+      document.body.classList.toggle("dark-mode");
+      const isDark = document.body.classList.contains("dark-mode");
+      localStorage.setItem("theme", isDark ? "dark":"light");
+      toggleBtn.textContent = isDark ? "☀️" : "🌙";
+    })
+  </script>
+</body>
+
 </html>
