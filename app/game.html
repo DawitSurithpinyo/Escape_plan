@@ -117,7 +117,7 @@
    }
    .belowleft{
     width: 70%;
-    margin: 0
+    margin: auto
    }
    .belowright{
     width: 30%;
@@ -218,7 +218,8 @@
       <div class="turn-timer">
         <div class="turn-timer-bar" id="turnBar"></div>
       </div>
-      <text id="player character" style="text-align: center;">Waiting for another player.</text></div>
+      <text id="player character" style="text-align: center;">Waiting for another player.</text>
+    </div>
         <div class = "belowright"><img src="../assets/arrow/idlew.png" id="moveindic" class ="moveindic"></div>
       </div>
 
@@ -353,7 +354,7 @@
       const tunRow = Math.round(tunOT / STEP);
       const tunCol = Math.round(tunOL / STEP);
       const tunnelPositions = (tunRow * COLS + tunCol);
-      if (tunnelPositions == targetCell && elemID=="warder")return false;};
+      if (tunnelPositions == targetCell && elemId=="warder")return false;};
     if (obstaclePositions.includes(targetCell)) return false;
     
     console.log(elem.style.top);
@@ -371,20 +372,28 @@
         document.removeEventListener("keydown", keyEventHandler);
       }
       keyEventHandler = (e) => {
-        if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)){
+        if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key)){
           e.preventDefault();
           if (e.repeat) return;
           const keydict = {
             ArrowUp: "../assets/arrow/up.png", 
             ArrowDown: "../assets/arrow/down.png", 
             ArrowLeft: "../assets/arrow/left.png", 
-            ArrowRight: "../assets/arrow/right.png"
+            ArrowRight: "../assets/arrow/right.png",
+            " ": "../assets/arrow/idlew.png"
+          }[e.key];
+          const worddict = {
+            ArrowUp: "Up", 
+            ArrowDown: "Down", 
+            ArrowLeft: "Left", 
+            ArrowRight: "Right",
+            " ": "Staying"
           }[e.key];
 
           const dir = {
-            ArrowUp: {dx:0,dy:1}, ArrowDown: {dx:0,dy:-1}, ArrowLeft: {dx:-1,dy:0}, ArrowRight: {dx:1,dy:0}
+            ArrowUp: {dx:0,dy:1}, ArrowDown: {dx:0,dy:-1}, ArrowLeft: {dx:-1,dy:0}, ArrowRight: {dx:1,dy:0}, " ":{dx:0,dy:0}
           }[e.key];
-          document.getElementById("movement").textContent = "you pressed " + e.key
+          document.getElementById("movement").textContent = "Your move : " + worddict
           document.getElementById("moveindic").src = keydict
           socket.emit(`${character} select move`, dir);
         }
