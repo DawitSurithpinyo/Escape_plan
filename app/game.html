@@ -519,6 +519,7 @@
     console.log(`${data.character}'s turn has ended.`);
     console.log(data);
     enableMoveSelection(false, data.character);
+    document.getElementById("movement").textContent = "Your move : "
     if (data.dx !== null && data.dy !== null) {
       if(moveCharacter(data.character, data.dx, data.dy)){
         socket.emit("move", data.dx, data.dy)
