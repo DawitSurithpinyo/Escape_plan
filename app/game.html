@@ -161,6 +161,36 @@
       border:5px solid black
     }
 
+    /* The Modal (background) */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 10; /* Sit on top */
+      padding-top: 100px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(0,0,0); /* Fallback color */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+    }
+
+    /* Modal's play again button */
+    #play-again-button:disabled {
+      opacity: 0.5; /* Makes the button appear faded */
+      pointer-events: none; /* Prevents clicking */
+    }
+
 </style>
 
 <body>
@@ -237,6 +267,18 @@
     </div>
     
   </div>
+
+  <!-- The Modal -->
+  <div id="ending-modal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+      <p id="modal-head-text"></p>
+      <button id="play-again-button">Yes</button>
+      <button id="go-home-button">No</button>
+    </div>
+
+  </div>
   <!-- <div class="full-screen-div">The watcher</div> -->
 </body>
 
@@ -296,22 +338,6 @@
     let tunnel = document.getElementById("tunnel");
     _initObjectPosition(tunnel, tunnelPos);
     tunnel.style.zIndex = 9;
-
-
-    // // actually start game
-    // let winner;
-    // while(!winner) {
-    //   var timeleft = 10;
-    //   var downloadTimer = setInterval(function(){
-    //     if(timeleft <= 0){
-    //       clearInterval(downloadTimer);
-    //     }
-    //     document.getElementById("countdown").textContent = timeleft;
-    //     timeleft -= 1;
-    //   }, 1000);
-
-    //   let timeout = setTimeout()
-    // }
   }
 
   function moveCharacter(elemId, dx, dy) {
@@ -455,15 +481,6 @@
   // "connect" is a built-in event in socket.io. It's auto called every time browser's socket connects successfully
   socket.on("connect", () => {
     console.log("Connected to game namespace");
-    // let user = await getUserInfo();
-    // var playerBox = document.getElementById("player1-box");
-    // if (playerBox.textContent.trim() !== "") {
-    //   playerBox = document.getElementById("player2-box");
-    // }
-    // playerBox.innerHTML += `
-    //   <text>Player: ${user.userName}</text>
-    //   <text>Win count: ${user.win}</text>
-    //   <text>Lose count: ${user.lose}</text>`
   });
 
   socket.on("first player", (player) => {
@@ -513,11 +530,43 @@
     document.getElementById("moveindic").src = "../assets/arrow/idlew.png"
   })
 
+
+
+  // stuff for when game ends (play again or exit)
+  var modal = document.getElementById("ending-modal");
+
   socket.on("game over", (winner) =>{
-    window.alert(`${winner} win`);
-    window.location.href = "/";
-    console.log(`${winner} win`);
+    document.getElementById("modal-head-text").innerText = `${winner} won. Do both players want to play again?`;
+    modal.style.display = "block";
+
+    var playBtn = document.getElementById("play-again-button");
+    playBtn.disabled = false;
+    var exitBtn = document.getElementById("go-home-button");
+
+    playBtn.addEventListener("click", () => {
+      socket.emit("play again selected");
+      playBtn.disabled = true;
+      playBtn.removeEventListener();
+    });
+
+    exitBtn.addEventListener("click", () => {
+      socket.emit("exit selected");
+      exitBtn.removeEventListener();
+    });
   });
+
+  socket.on("exit", () => {
+    modal.style.display = "none";
+    window.location.href = "/";
+  });
+
+  socket.on("play again", () => {
+    modal.style.display = "none";
+    window.location.reload();
+  });
+
+
+
   socket.on("reset:all", () => {
     console.log("Server requested full reset");
     alert("Game has been reset by admin!");
