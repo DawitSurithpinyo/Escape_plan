@@ -1,134 +1,217 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Game page</title>
+
+  <!-- THEME VARIABLES -->
+  <style>
+    :root {
+      --bg-main: aliceblue;
+      --bg-side: salmon;
+      --bg-grid: rgb(71, 71, 71);
+      --text-color: black;
+      --border-color: black;
+      --accent: blueviolet;
+    }
+
+    /* DARK THEME VARIANT */
+    body.dark {
+      --bg-main: #1e1e1e;
+      --bg-side: #2c2c2c;
+      --bg-grid: #3a3a3a;
+      --text-color: #e0e0e0;
+      --border-color: #444;
+      --accent: #7a5af5;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      height: 100%;
+      background-color: var(--bg-main);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .row {
+      display: flex;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .column {
+      margin: 0;
+    }
+
+    .side {
+      width: 50%;
+      margin: 0;
+    }
+
+    .full-screen-div {
+      height: 100vh;
+      width: 100vw;
+      background-color: var(--accent);
+    }
+
+    .grid-div {
+      width: 60%;
+      height: 60%;
+      border-color: var(--border-color);
+      border-width: 1px;
+      border-style: solid;
+      background-color: var(--bg-grid);
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 5%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .grid-row {
+      width: 100%;
+      height: 20%;
+      flex-direction: row;
+      display: flex;
+    }
+
+    .grid-cell {
+      width: 20%;
+      height: 100%;
+      margin: 0%;
+      border-color: var(--border-color);
+      border-width: 1px;
+      border-style: solid;
+      display: flex;
+    }
+
+    .grid-cell.pointer {
+      outline: 3px solid limegreen;
+      background-color: chartreuse;
+    }
+
+    .moveindic {
+      border: 1px solid var(--border-color);
+      height: 130px;
+      width: 130px;
+      margin: 10px;
+    }
+
+    text {
+      display: block;
+      text-align: center;
+      font-weight: 300;
+    }
+
+    .game_obj {
+      position: absolute;
+      width: 20%;
+      height: 20%;
+      z-index: 10;
+      left: 0%;
+      top: 0%;
+    }
+
+    .belowgrid {
+      margin: 5%;
+      display: flex;
+      border: 1px solid var(--border-color);
+    }
+
+    .belowleft {
+      width: 70%;
+      margin: auto;
+    }
+
+    .belowright {
+      width: 30%;
+      margin: 0;
+    }
+
+    .turn-timer {
+      width: 60%;
+      height: 12px;
+      margin: 12px auto 0;
+      background: #2e2e2e;
+      border-radius: 999px;
+      overflow: hidden;
+      box-shadow: inset 0 0 4px rgba(0, 0, 0, .4);
+    }
+
+    .turn-timer-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #4ade80, #22c55e);
+    }
+
+    .playerbox {
+      height: 20%;
+      margin: 20px;
+      border: 5px solid var(--border-color);
+    }
+
+    .playercount {
+      height: 40%;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .playerindiv {
+      height: 60%;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+
+    .chatbox {
+      height: 50%;
+      margin: 20px;
+      border: 5px solid var(--border-color);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      padding-top: 100px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: var(--bg-main);
+      margin: auto;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      width: 80%;
+      color: var(--text-color);
+    }
+
+    #play-again-button:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  </style>
 </head>
-<style>
-  html {
-    height: 100%;
-  }
-
-  body {
-    margin: 0;
-    height: 100%
-  }
-
-  .row {
-    display: flex;
-    margin: 0;
-    width: 100%;
-    height: 100%
-  }
-
-  .column {
-    margin: 0
-  }
-
-  .side {
-    width: 25%;
-    margin: 0
-  }
-
-  .middle {
-    width: 50%;
-    margin: 0
-  }
-
-  .full-screen-div {
-    height: 100vh;
-    width: 100vw;
-    background-color: blueviolet;
-  }
-
-  .grid-div {
-    width: 60%;
-    height: 60%;
-    border-color: black;
-    border-width: 1px;
-    border-style: solid;
-    background-color: rgb(71, 71, 71);
-    margin-left: auto;
-    /* auto margin-left = push to right */
-    margin-right: auto;
-    /* auto both margins = centered */
-    margin-top: 5%;
-    display: flex;
-    /* prevent child div overflowing */
-    flex-direction: column;
-    position: relative;
-  }
-
-  .grid-row {
-    width: 100%;
-    height: 20%;
-    flex-direction: row;
-    display: flex;
-  }
-
-  .grid-cell {
-    width: 20%;
-    height: 100%;
-    margin: 0%;
-    border-color: black;
-    border-width: 1px;
-    border-style: solid;
-    display: flex;
-  }
-
-  .grid-cell.pointer {
-    outline: 3px solid limegreen;
-    background-color: chartreuse;
-  }
-  text{
-    display: block;
-    text-align: center;
-    font-weight: 300;
-  }
-
-  .game_obj {
-    /* images of warder, prisoner, obstacles, tunnel, etc. */
-    /* position: absolute;
-      margin-top: -100px;
-      margin-left: -100px;
-        */
-    position: absolute;
-    width: 20%;
-    height: 20%;
-    /* align-self: center; */
-    z-index: 10;
-    /* margin: auto; */
-    /* top: 100px; */
-    left: 0%;
-    top: 0%;
-    /* transform: translate(-50%); */
-    /* left: 100%; */
-    /* bottom: 20px; */
-  }
-  .turn-timer {
-  width: 60%;
-  height: 12px;
-  margin: 12px auto 0;
-  background: #2e2e2e;
-  border-radius: 999px;
-  overflow: hidden;
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, .4);
-}
-
-.turn-timer-bar {
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, #4ade80, #22c55e);
-}
-
-</style>
 
 <body>
   <div class="row">
-    <div class="column side" style="background-color: aqua;">This is to the left</div>
-    <div class="column middle" style="background-color: aliceblue">
+    <div class="column side" style="background-color: var(--bg-main)">
       <div class="grid-div" id="main grid">
+        <audio id="BGaudio" autoplay loop><source src="assets/monkey.mp3" type="audio/mpeg"></audio>
+        <audio id="WinAudio"><source src="assets/cheer.mp3" type="audio/mpeg"></audio>
+        <audio id="WalkAudio"><source src="assets/Bwomp.mp3" type="audio/mpeg"></audio>
+
         <img src="../assets/warder_icon.png" alt="warder" id="warder" class="game_obj">
         <img src="../assets/prisoner_icon.png" alt="prisoner" id="prisoner" class="game_obj">
         <img src="../assets/tunnel_icon.png" alt="tunnel" id="tunnel" class="game_obj">
@@ -138,6 +221,7 @@
         <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle3" class="game_obj">
         <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle4" class="game_obj">
 
+        <!-- grid -->
         <div class="grid-row" id="row 0">
           <div class="grid-cell" id="cell 0"></div>
           <div class="grid-cell" id="cell 1"></div>
@@ -174,21 +258,51 @@
           <div class="grid-cell" id="cell 24"></div>
         </div>
       </div>
-      <text id="countdown" style="text-align: center;">Welcome!</text>
-      <text id="movement" style="text-align: center;">Staying</text>
-      <div class="turn-timer">
-        <div class="turn-timer-bar" id="turnBar"></div>
-      </div>
-      <text id="player character" style="text-align: center;">Waiting for another player.</text>
-    </div>
-    <div class="column side" style="background-color: salmon">This is to the right</div>
-    <p>Players online: <span id="playerOnline">0</span></p>
-  </div>
-  <!-- <div class="full-screen-div">The watcher</div> -->
-</body>
 
-<script src="/socket.io/socket.io.js"></script>
-<script type="module">
+      <div class="belowgrid">
+        <div class="belowleft">
+          <text id="countdown" style="text-align: center;">Welcome!</text>
+          <text id="movement" style="text-align: center;">Staying</text>
+          <div class="turn-timer">
+            <div class="turn-timer-bar" id="turnBar"></div>
+          </div>
+          <text id="player character" style="text-align: center;">Waiting for another player.</text>
+        </div>
+        <div class="belowright">
+          <img src="../assets/arrow/idlew.png" id="moveindic" class="moveindic">
+        </div>
+      </div>
+    </div>
+
+    <div class="column side" style="background-color: var(--bg-side)">
+      <div class="playerbox">
+        <div class="playercount">Players online: <span id="playerOnline">0</span></div>
+        <div class="row">
+          <div class="column side playerindiv" id="player1-box"></div>
+          <div class="column side playerindiv" id="player2-box"></div>
+        </div>
+      </div>
+      <div class="chatbox">Chatbox here</div>
+    </div>
+  </div>
+
+  <!-- The Modal -->
+  <div id="ending-modal" class="modal">
+    <div class="modal-content">
+      <p id="modal-head-text"></p>
+      <button id="play-again-button">Yes</button>
+      <button id="go-home-button">No</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script type="module">
+    // ✅ Load Theme Preference
+    const savedTheme = localStorage.getItem("theme") || "light";
+    if (savedTheme === "dark") {
+      document.body.classList.add("dark");
+    }
   import { gridInit, display_grid } from '../util/algotest.js';
 
   function _initObjectPosition(htmlElem, posInGrid) {
@@ -243,22 +357,6 @@
     let tunnel = document.getElementById("tunnel");
     _initObjectPosition(tunnel, tunnelPos);
     tunnel.style.zIndex = 9;
-
-
-    // // actually start game
-    // let winner;
-    // while(!winner) {
-    //   var timeleft = 10;
-    //   var downloadTimer = setInterval(function(){
-    //     if(timeleft <= 0){
-    //       clearInterval(downloadTimer);
-    //     }
-    //     document.getElementById("countdown").textContent = timeleft;
-    //     timeleft -= 1;
-    //   }, 1000);
-
-    //   let timeout = setTimeout()
-    // }
   }
 
   function moveCharacter(elemId, dx, dy) {
@@ -301,7 +399,7 @@
       const tunRow = Math.round(tunOT / STEP);
       const tunCol = Math.round(tunOL / STEP);
       const tunnelPositions = (tunRow * COLS + tunCol);
-      if (tunnelPositions == targetCell && elemID=="warder")return false;};
+      if (tunnelPositions == targetCell && elemId=="warder")return false;};
     if (obstaclePositions.includes(targetCell)) return false;
     
     console.log(elem.style.top);
@@ -318,16 +416,30 @@
       if (keyEventHandler) {
         document.removeEventListener("keydown", keyEventHandler);
       }
-
       keyEventHandler = (e) => {
-        if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)){
+        if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key)){
           e.preventDefault();
           if (e.repeat) return;
+          const keydict = {
+            ArrowUp: "../assets/arrow/up.png", 
+            ArrowDown: "../assets/arrow/down.png", 
+            ArrowLeft: "../assets/arrow/left.png", 
+            ArrowRight: "../assets/arrow/right.png",
+            " ": "../assets/arrow/idlew.png"
+          }[e.key];
+          const worddict = {
+            ArrowUp: "Up", 
+            ArrowDown: "Down", 
+            ArrowLeft: "Left", 
+            ArrowRight: "Right",
+            " ": "Staying"
+          }[e.key];
 
           const dir = {
-            ArrowUp: {dx:0,dy:1}, ArrowDown: {dx:0,dy:-1}, ArrowLeft: {dx:-1,dy:0}, ArrowRight: {dx:1,dy:0}
+            ArrowUp: {dx:0,dy:1}, ArrowDown: {dx:0,dy:-1}, ArrowLeft: {dx:-1,dy:0}, ArrowRight: {dx:1,dy:0}, " ":{dx:0,dy:0}
           }[e.key];
-          document.getElementById("movement").textContent = "you pressed " + e.key
+          document.getElementById("movement").textContent = "Your move : " + worddict
+          document.getElementById("moveindic").src = keydict
           socket.emit(`${character} select move`, dir);
         }
       };
@@ -339,12 +451,12 @@
     }
   }
 
-  function startCountdown() {
+  function startCountdown(time) {
     const bar = document.getElementById("turnBar");
     if (!bar) return;
 
 
-    var timeleft = 10;
+    var timeleft = time;
     var total = timeleft;
 
     var timer = setInterval(function(){
@@ -358,6 +470,23 @@
     }, 1000);
   }
 
+  async function getUserInfo() {
+    const res = await fetch('/api/getUser', {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (res.ok) {
+      return await res.json();
+    }
+  }
+
+
+  // upon landing, fetch user info
+  await getUserInfo();
 
   // custom "namespace" to split logic of game IO from other IO
   const socket = io("/game");
@@ -373,6 +502,26 @@
     console.log("Connected to game namespace");
   });
 
+  socket.on("first player", (player) => {
+    document.getElementById("player1-box").innerHTML += `
+      <text>Player: ${player.userName}</text>
+      <text>Win count: ${player.win}</text>
+      <text>Lose count: ${player.lose}</text>`;
+  });
+
+  socket.on("both players", (players) => {
+    const [p1, p2] = players;
+    document.getElementById("player1-box").innerHTML = `
+      <text>${p1.userName}</text>
+      <text>win count: ${p1.win}</text>
+      <text>lose count: ${p1.lose}</text>`;
+
+    document.getElementById("player2-box").innerHTML = `
+      <text>${p2.userName}</text>
+      <text>win count: ${p2.win}</text>
+      <text>lose count: ${p2.lose}</text>`;
+  });
+
   // custom event, must be emitted by server to be activated
   socket.on("start game", (data) => {
     gameStart(data.grid, data.obsPosArray, data.warderPos, data.prisonerPos, data.tunnelPos, data.character);
@@ -382,13 +531,14 @@
   socket.on("turn start", (character) => {
     console.log("turn start reached");
     enableMoveSelection(true, character);
-    startCountdown();
+    startCountdown(10);
   });
 
   socket.on("turn end", (data) => {
     console.log(`${data.character}'s turn has ended.`);
     console.log(data);
     enableMoveSelection(false, data.character);
+    document.getElementById("movement").textContent = "Your move : "
     if (data.dx !== null && data.dy !== null) {
       if(moveCharacter(data.character, data.dx, data.dy)){
         socket.emit("move", data.dx, data.dy)
@@ -397,11 +547,52 @@
         socket.emit("move", 0,0)
       }
     }
+    document.getElementById('WalkAudio').play()
+    document.getElementById("moveindic").src = "../assets/arrow/idlew.png"
   })
 
+
+
+  // stuff for when game ends (play again or exit)
+  var modal = document.getElementById("ending-modal");
+
   socket.on("game over", (winner) =>{
-    window.alert(`${winner} win`);
-    console.log(`${winner} win`);
+    document.getElementById("modal-head-text").innerText = `${winner} won. Do both players want to play again?`;
+    modal.style.display = "block";
+    document.getElementById('WinAudio').play()
+
+    var playBtn = document.getElementById("play-again-button");
+    playBtn.disabled = false;
+    var exitBtn = document.getElementById("go-home-button");
+
+    playBtn.addEventListener("click", () => {
+      socket.emit("play again selected");
+      playBtn.disabled = true;
+      playBtn.removeEventListener();
+    });
+
+    exitBtn.addEventListener("click", () => {
+      socket.emit("exit selected");
+      exitBtn.removeEventListener();
+    });
+  });
+
+  socket.on("exit", () => {
+    modal.style.display = "none";
+    window.location.href = "/";
+  });
+
+  socket.on("play again", () => {
+    modal.style.display = "none";
+    window.location.reload();
+  });
+
+
+
+  socket.on("reset:all", () => {
+    console.log("Server requested full reset");
+    alert("Game has been reset by admin!");
+    window.location.href = "/"; // go back to home page
   });
 </script>
 
