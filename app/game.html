@@ -283,6 +283,12 @@
         </div>
       </div>
       <div class="chatbox">Chatbox here</div>
+      <!-- game counter -->
+<div class="game-counter">
+    <div>Game: <span id="current-game">0</span></div>
+    <div>Turn: <span id="current-turn">0</span></div>
+</div>
+
     </div>
   </div>
 
@@ -500,6 +506,14 @@
   // "connect" is a built-in event in socket.io. It's auto called every time browser's socket connects successfully
   socket.on("connect", () => {
     console.log("Connected to game namespace");
+  });
+
+  socket.on('server:updateGames', function(data) {
+    document.getElementById('current-game').textContent = data.totalGamesPlayed;
+  });
+
+  socket.on('server:updateTurns', function(data) {
+    document.getElementById('current-turn').textContent = data.totalTurnsThisGame;
   });
 
   socket.on("first player", (player) => {
