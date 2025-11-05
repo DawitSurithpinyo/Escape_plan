@@ -305,6 +305,7 @@
 
   <script type="module">
     // ✅ Load Theme Preference
+    var time = 10
     const savedTheme = localStorage.getItem("theme") || "light";
     if (savedTheme === "dark") {
       document.body.classList.add("dark");
@@ -461,9 +462,8 @@
     const bar = document.getElementById("turnBar");
     if (!bar) return;
 
-
+    const total = time
     var timeleft = time;
-    var total = timeleft;
 
     var timer = setInterval(function(){
       if(timeleft <= 0){
@@ -508,6 +508,12 @@
     console.log("Connected to game namespace");
   });
 
+  socket.on("server:updateGameSpeed", ({ speed }) => {
+    console.log('[game client] received server:updateGameSpeed ->', speed);
+    time = speed;
+  });
+
+
   socket.on('server:updateGames', function(data) {
     document.getElementById('current-game').textContent = data.totalGamesPlayed;
   });
@@ -545,7 +551,7 @@
   socket.on("turn start", (character) => {
     console.log("turn start reached");
     enableMoveSelection(true, character);
-    startCountdown(10);
+    startCountdown(time);
   });
 
   socket.on("turn end", (data) => {

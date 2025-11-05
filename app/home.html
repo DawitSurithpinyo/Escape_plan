@@ -157,9 +157,13 @@
         <form id="form1" action="">
           <input id="name" autocomplete="off" /><button>Confirm</button>
         </form>
-        <p>game speed: <span id="game speed">10</span></p>
+        <p>turn duration: <span id="game speed">10</span></p>
         <form id="form2" action="">
           <input id="gameSpeed" autocomplete="off" /><button>Confirm</button>
+        </form>
+        <p>Obstacle count: <span id="obstacle">10</span></p>
+        <form id="form3" action="">
+          <input id="ObstacleCount" autocomplete="off" /><button>Confirm</button>
         </form>
         <button id="gamebutton" class="button">Play</button>
       </div>
@@ -197,6 +201,8 @@
       const socket = io();
       const username = document.getElementById('username');
       const form1 = document.getElementById('form1');
+      const form2 = document.getElementById('form2');
+      const form3 = document.getElementById('form3');
       const name = document.getElementById('name');
       const gameSpeed = document.getElementById('gameSpeed')
       const form = document.getElementById('form');
@@ -323,6 +329,18 @@
         }
       });
 
+      form2.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const speed = parseFloat(gameSpeed.value.trim());
+        if (!isNaN(speed)) {
+          socket.emit("game:setSpeed", speed);
+          gameSpeed.value = "";
+          const gameSocket = io("/game");
+          gameSocket.emit("server:updateGameSpeed", { speed });
+        }
+      });
+
+
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         if (input.value) {
@@ -350,6 +368,7 @@
         const speedEl = document.getElementById("game speed");
         if (speedEl) speedEl.textContent = speed;
       });
+
 
       socket.on('status message',(msg) => {
         const item = document.createElement('li');
