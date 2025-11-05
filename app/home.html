@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Socket.IO chat</title>
+    <style>
+      /* ==== THEME VARIABLES ==== */
+      :root {
+        --bg-color: #ffffff;
+        --text-color: #000000;
+        --card-bg: #ffffff;
+        --border-color: #ddd;
+        --accent-color: #4CAF50;
+        --input-bg: rgba(99,74,74,0.15);
+      }
+      body.dark {
+        --bg-color: #121212;
+        --text-color: #e5e5e5;
+        --card-bg: #1f1f1f;
+        --border-color: #333;
+        --accent-color: #4CAF50;
+        --input-bg: rgba(255,255,255,0.08);
+      }
+
+      /* ==== BASE STYLES ==== */
+      body {
+        margin: 0;
+        padding-bottom: 3rem;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+      }
+
+      .row { display:flex; height:100%; border:1px solid var(--border-color); }
+      .column { border:1px solid var(--border-color); }
+      .left { width:25%; background-color: var(--card-bg); }
+      .right { width:75%; background-color: var(--card-bg); }
+
+      /* ==== CHAT INPUT BAR ==== */
+      #form {
+        background: var(--input-bg);
+        padding: 0.25rem;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        display: flex; height: 3rem;
+        box-sizing: border-box;
+        backdrop-filter: blur(10px);
+      }
+      #input {
+        border: none; padding: 0 1rem; flex-grow: 1;
+        border-radius: 2rem; margin: 0.25rem;
+        background: var(--card-bg); color: var(--text-color);
+      }
+      #input:focus { outline: none; }
+      #form > button {
+        background: var(--accent-color);
+        border: none;
+        padding: 0 1rem; margin: 0.25rem;
+        border-radius: 3px; outline: none; color: #fff;
+      }
+
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages > li { padding: 0.5rem 1rem; border-bottom: 1px solid var(--border-color); }
+      #messages > li:nth-child(odd) { background: rgba(0,0,0,0.03); }
+
+      .button {
+        background-color: var(--accent-color);
+        color: white; width: 100%;
+        border-radius: 8px; border: none;
+        padding: 10px; margin-top: 10px;
+        font-size: 16px; cursor: pointer;
+      }
+
+      /* ==== PLAYERS UI ==== */
+      #test\ users { padding: 10px; }
+      .players-header {
+        display:flex; align-items:center; justify-content:space-between;
+        gap:8px; margin:8px 0 6px;
+      }
+      .players-header h3 { margin:0; font-size:16px; }
+      .players-grid {
+        display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:10px;
+      }
+      .player-card {
+        background: var(--card-bg); border:1px solid var(--border-color);
+        border-radius:10px; padding:10px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      }
+      .player-top { display:flex; align-items:center; gap:10px; }
+      .avatar {
+        width:36px; height:36px; border-radius:999px;
+        display:flex; align-items:center; justify-content:center;
+        background:#f3f4f6; font-weight:600;
+        border:1px solid var(--border-color);
+      }
+      .name { font-weight:600; }
+      .userid { font-size:12px; color:#888; word-break:break-all; }
+      .stats { margin-top:8px; font-size:13px; display:flex; gap:12px; }
+      .chip {
+        display:inline-block; padding:2px 8px;
+        border-radius:999px; font-size:12px;
+        border:1px solid var(--border-color);
+        background:#f9fafb;
+      }
+      .chip.warder { background:#eef6ff; border-color:#cfe3ff; }
+      .chip.prisoner { background:#fff2ee; border-color:#ffd6cc; }
+      .pill { font-size:12px; padding:2px 8px; border-radius:999px;
+        border:1px solid var(--border-color); background:#fafafa; }
+
+      .toolbar { display:flex; gap:8px; align-items:center; }
+      .toolbar input {
+        height:28px; padding:0 8px;
+        border:1px solid var(--border-color); border-radius:6px;
+        font-size:13px; width:160px; background:var(--card-bg); color:var(--text-color);
+      }
+      .toolbar button {
+        height:28px; padding:0 10px;
+        border:1px solid var(--border-color);
+        background:var(--card-bg); border-radius:6px;
+        cursor:pointer; font-size:13px; color:var(--text-color);
+      }
+
+      /* ==== THEME TOGGLE BUTTON ==== */
+      #themeToggle {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: var(--card-bg);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+        border-radius: 50%;
+        width: 36px; height: 36px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        font-size: 18px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: background 0.2s ease;
+      }
+      #themeToggle:hover {
+        background: var(--accent-color);
+        color: white;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="themeToggle" title="Toggle theme">🌙</div> <!-- 🌙 / ☀️ toggle button -->
+
+    <div class="row">
+      <audio id="BGaudio" autoplay loop>
+        <source src="assets/elevator.mp3" type="audio/mpeg">
+      </audio>
+
+      <div class="column left">
+        <p>Players online: <span id="playerOnline">0</span></p>
+        <h1 id="username">Username : </h1>
+        <form id="form1" action="">
+          <input id="name" autocomplete="off" /><button>Confirm</button>
+        </form>
+        <p>game speed: <span id="game speed">10</span></p>
+        <form id="form2" action="">
+          <input id="gameSpeed" autocomplete="off" /><button>Confirm</button>
+        </form>
+        <button id="gamebutton" class="button">Play</button>
+      </div>
+
+      <div class="column right">
+        <ul id="messages"></ul>
+      </div>
+
+      <form id="form" action="">
+        <input id="input" autocomplete="off" /><button>Send</button>
+      </form>
+
+      <div id="test users"></div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      /* ==== THEME SWITCH LOGIC ==== */
+      const toggleBtn = document.getElementById("themeToggle");
+      const body = document.body;
+      const savedTheme = localStorage.getItem("theme");
+
+      if (savedTheme === "dark") {
+        body.classList.add("dark");
+        toggleBtn.textContent = "☀️";
+      }
+
+      toggleBtn.addEventListener("click", () => {
+        const dark = body.classList.toggle("dark");
+        toggleBtn.textContent = dark ? "☀️" : "🌙";
+        localStorage.setItem("theme", dark ? "dark" : "light");
+      });
+
+      /* ==== EXISTING SCRIPT BELOW ==== */
+      const socket = io();
+      const username = document.getElementById('username');
+      const form1 = document.getElementById('form1');
+      const name = document.getElementById('name');
+      const gameSpeed = document.getElementById('gameSpeed')
+      const form = document.getElementById('form');
+      const input = document.getElementById('input');
+      const messages = document.getElementById('messages');
+
+      async function getAllUsers() {
+        const res = await fetch("/api/getAllUser", {
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" }
+        });
+        if (res.ok) return await res.json();
+        return {};
+      }
+
+      async function getUser() {
+        const res = await fetch("/api/getUser", {
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" }
+        });
+        if (res.ok) return await res.json();
+        return {};
+      }
+
+      async function renderPlayers(allUsers) {
+        const container = document.getElementById("test users");
+        if (!container) return;
+
+        const players = Object.entries(allUsers || {}).map(([id, u]) => ({
+          id,
+          userName: (u?.userName && u.userName.trim()) ? u.userName.trim() : "(guest)",
+          win: u?.win ?? 0,
+          lose: u?.lose ?? 0,
+          role: u?.roleCurrentGame ?? null
+        }));
+
+        const thisUser = await getUser();
+        username.innerHTML = "Username : " + (thisUser.userName ?? "");
+
+        let html = `
+          <div class="players-header">
+            <h3>All Players <span class="pill">${players.length}</span></h3>
+            <div class="toolbar">
+              <input id="playerSearch" type="search" placeholder="Search name/ID"/>
+              <button id="refreshBtn" type="button">Refresh</button>
+            </div>
+          </div>
+        `;
+        html += `<div class="players-grid" id="playersGrid"></div>`;
+        container.innerHTML = html;
+
+        const grid = document.getElementById("playersGrid");
+        const searchEl = document.getElementById("playerSearch");
+        const draw = () => {
+          const q = (searchEl?.value || "").toLowerCase();
+          const list = players
+            .filter(p => !q || p.userName.toLowerCase().includes(q) || p.id.toLowerCase().includes(q))
+            .sort((a,b) => b.win - a.win);
+          grid.innerHTML = list.map(p => `
+            <div class="player-card">
+              <div class="player-top">
+                <div class="avatar">${p.userName === "(guest)" ? "G" : p.userName[0].toUpperCase()}</div>
+                <div>
+                  <div class="name">${p.userName}</div>
+                  <div class="userid">${p.id}</div>
+                </div>
+              </div>
+              <div class="stats">
+                <span>🏆 <strong>${p.win}</strong> wins</span>
+                <span>💥 <strong>${p.lose}</strong> loses</span>
+              </div>
+              <div style="margin-top:8px;">
+                <span class="chip ${p.role === 'warder' ? 'warder' : p.role === 'prisoner' ? 'prisoner' : ''}">
+                  ${p.role ? `Role: ${p.role}` : 'Role: —'}
+                </span>
+              </div>
+            </div>
+          `).join("");
+        };
+
+        draw();
+        searchEl?.addEventListener("input", draw);
+        document.getElementById("refreshBtn")?.addEventListener("click", async () => {
+          await refreshPlayers();
+        });
+      }
+
+      async function refreshPlayers() {
+        const all = await getAllUsers();
+        await renderPlayers(all);
+      }
+
+      socket.on("admin:reset", () => {
+        console.log("Scores reset by admin - refreshing leaderboard");
+        refreshPlayers();
+      });
+
+      window.addEventListener("DOMContentLoaded", async () => {
+        await new Promise(r => setTimeout(r, 100));
+        await refreshPlayers();
+        setInterval(refreshPlayers, 5000);
+      });
+
+      socket.on("server:updateOnline", ({ online }) => {
+        const el = document.getElementById("playerOnline");
+        if (el) el.textContent = online;
+      });
+
+      form1.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (name.value) {
+          username.innerHTML = "Username : " + name.value;
+          socket.emit('status message', name.value);
+          await fetch('/api/setUsername', {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userName: name.value })
+          });
+          name.value = '';
+          refreshPlayers();
+        }
+      });
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (input.value) {
+          socket.emit('chat message', input.value);
+          input.value = '';
+        }
+      });
+
+      const gamebutton = document.getElementById('gamebutton');
+      gamebutton.addEventListener('click', (e) => {
+        e.preventDefault();
+        const currentUser = username.textContent;
+        socket.emit('game start', currentUser);
+        window.location.href = "/game";
+      });
+
+      socket.on('chat message', (msg) => {
+        const item = document.createElement('li');
+        item.textContent = msg;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      socket.on("server:updateGameSpeed", ({ speed }) => {
+        const speedEl = document.getElementById("game speed");
+        if (speedEl) speedEl.textContent = speed;
+      });
+
+      socket.on('status message',(msg) => {
+        const item = document.createElement('li');
+        item.textContent = msg;
+        item.style.fontWeight = "bold";
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      socket.on('set name',(name) => { console.log(name); });
+      socket.on('playercount',(number) => {
+        const el = document.getElementById('player2');
+        if (el) el.textContent = number;
+      });
+    </script>
+  </body>
+</html>
