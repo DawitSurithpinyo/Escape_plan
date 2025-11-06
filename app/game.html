@@ -215,11 +215,11 @@
         <img src="../assets/warder_icon.png" alt="warder" id="warder" class="game_obj">
         <img src="../assets/prisoner_icon.png" alt="prisoner" id="prisoner" class="game_obj">
         <img src="../assets/tunnel_icon.png" alt="tunnel" id="tunnel" class="game_obj">
-        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle0" class="game_obj">
+        <!-- <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle0" class="game_obj">
         <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle1" class="game_obj">
         <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle2" class="game_obj">
         <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle3" class="game_obj">
-        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle4" class="game_obj">
+        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle4" class="game_obj"> -->
 
         <!-- grid -->
         <div class="grid-row" id="row 0">
@@ -305,7 +305,7 @@
 
   <script type="module">
     // ✅ Load Theme Preference
-    var time = 10
+    var turnTime = 10
     const savedTheme = localStorage.getItem("theme") || "light";
     if (savedTheme === "dark") {
       document.body.classList.add("dark");
@@ -328,14 +328,9 @@
 
   function gameStart(grid, obsPos, warderPos, prisonerPos, tunnelPos) {
     if (!grid && !obsPos && !warderPos && !prisonerPos && !tunnelPos) {
-      // generate random map
-      const result = gridInit();
-      grid = result.grid;
-      obsPos = result.obsPos;
-      warderPos = result.warderPos;
-      prisonerPos = result.prisonerPos;
-      tunnelPos = result.tunnelPos;
-      
+      // supposed to receive grid from server
+      console.log("Error: No grid data from server");
+      return;
     }
     //console.log(`Hello, is this ${result}`);
     display_grid(grid);
@@ -351,6 +346,8 @@
     // put objects to their starting position
     for (let i = 0; i < obsPosArray.length; i++) {
       let pos = obsPosArray[i];
+      document.getElementById("main grid").innerHTML += `
+        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle${i}" class="game_obj">`
       let obs = document.getElementById(`obstacle${i}`);
       _initObjectPosition(obs, pos);
     }
@@ -458,12 +455,12 @@
     }
   }
 
-  function startCountdown(time) {
+  function startCountdown(turnTime) {
     const bar = document.getElementById("turnBar");
     if (!bar) return;
-
-    const total = time
-    var timeleft = time;
+    console.log(turnTime)
+    const total = turnTime
+    var timeleft = turnTime;
 
     var timer = setInterval(function(){
       if(timeleft <= 0){
@@ -496,11 +493,17 @@
 
   // custom "namespace" to split logic of game IO from other IO
   const socket = io("/game");
+  var time = 10
 
   // player count identifier
   socket.on("server:updateOnline", ({ online }) => {
     const el = document.getElementById("playerOnline");
     if (el) el.textContent = online;
+  });
+
+  socket.on("Speed", ({time}) => {
+    console.log("speed received")
+    turnTime = time;
   });
 
   // "connect" is a built-in event in socket.io. It's auto called every time browser's socket connects successfully
@@ -548,10 +551,10 @@
     document.getElementById("player character").textContent = `You are ${data.character}`
   });
 
-  socket.on("turn start", (character) => {
+  socket.on("turn start", ({character, time2}) => {
     console.log("turn start reached");
     enableMoveSelection(true, character);
-    startCountdown(time);
+    startCountdown(time2);
   });
 
   socket.on("turn end", (data) => {

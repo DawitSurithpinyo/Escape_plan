@@ -16,7 +16,7 @@ function getRandomSpot(){
     return Math.floor(Math.random()*25)
 }
 
-function gridInit(){
+function gridInit(obstacleAmt){
     let grid = emptyGrid();
     let obsPos = new Set();
     let warderPos;
@@ -24,6 +24,9 @@ function gridInit(){
     let tunnelPos;
 
     let count = 5;
+    if(!isNaN(obstacleAmt)){
+        count = obstacleAmt;
+    }
     let i = 0;
     while(i<count){
         let pos = getRandomSpot()

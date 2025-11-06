@@ -11,7 +11,7 @@ const sessions = require('./util/sessions.js');
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
-let gameSpeed = 10;
+
 
 app.use(express.static(__dirname));
 app.use(express.json()); // to parse JSON in requests
@@ -71,22 +71,6 @@ app.get('/api/getUser', (req, res) => {
 
 app.get('/api/getAllUser', (req, res) => {
   res.status(200).json( sessions );
-});
-
-app.get("/api/getGameSpeed", (req, res) => {
-  res.status(200).json({ speed: gameSpeed });
-});
-
-app.post("/api/setGameSpeed", (req, res) => {
-  const { speed } = req.body;
-  if (typeof speed !== "number" || isNaN(speed) || speed <= 0) {
-    return res.status(400).json({ error: "Invalid speed value" });
-  }
-
-  gameSpeed = speed;
-  console.log(`Game speed updated to: ${speed}`);
-  io.emit("server:updateGameSpeed", { speed });
-  res.status(200).json({ speed: gameSpeed });
 });
 
 

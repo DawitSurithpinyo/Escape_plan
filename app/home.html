@@ -161,7 +161,7 @@
         <form id="form2" action="">
           <input id="gameSpeed" autocomplete="off" /><button>Confirm</button>
         </form>
-        <p>Obstacle count: <span id="obstacle">10</span></p>
+        <p>Obstacle count: <span id="obstacle">5</span></p>
         <form id="form3" action="">
           <input id="ObstacleCount" autocomplete="off" /><button>Confirm</button>
         </form>
@@ -204,7 +204,8 @@
       const form2 = document.getElementById('form2');
       const form3 = document.getElementById('form3');
       const name = document.getElementById('name');
-      const gameSpeed = document.getElementById('gameSpeed')
+      const gameSpeed = document.getElementById('gameSpeed');
+      const obstacleCount = document.getElementById('ObstacleCount');
       const form = document.getElementById('form');
       const input = document.getElementById('input');
       const messages = document.getElementById('messages');
@@ -332,11 +333,35 @@
       form2.addEventListener("submit", (e) => {
         e.preventDefault();
         const speed = parseFloat(gameSpeed.value.trim());
-        if (!isNaN(speed)) {
+        if (!isNaN(speed) || !(speed < 1) || !(speed > 10)) {
           socket.emit("game:setSpeed", speed);
+          document.getElementById("game speed").innerText = speed;
           gameSpeed.value = "";
         }
       });
+
+
+
+      form3.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const count = parseInt(obstacleCount.value.trim());
+        if(isNaN(count) || count < 0 || count > 5){
+          return;
+        }
+        socket.emit("set obstacle", { count });
+        document.getElementById("obstacle").innerText = count;
+        obstacleCount.value = "";
+      });
+
+      // when other player change obstacle count, or when first arriving on home page
+      socket.on("receive obstacle", ({ count }) => {
+        document.getElementById("obstacle").innerText = count;
+      });
+
+      socket.on("receive speed", ({ newSpeed }) => {
+        document.getElementById("game speed").innerText = newSpeed;
+      });
+
 
 
       form.addEventListener('submit', (e) => {
