@@ -392,12 +392,15 @@
 
   <script type="module">
     // ✅ Load Theme Preference
-    var turnTime = 10
     const savedTheme = localStorage.getItem("theme") || "light";
     if (savedTheme === "dark") {
       document.body.classList.add("dark");
     }
+
   import { gridInit, display_grid } from '../util/algotest.js';
+
+  var turnTime = 10;
+  var obstacleIcon = "obstacle_icon.png";
 
   function _initObjectPosition(htmlElem, posInGrid) {
     let elemStyle = window.getComputedStyle(htmlElem);
@@ -433,8 +436,9 @@
     // put objects to their starting position
     for (let i = 0; i < obsPosArray.length; i++) {
       let pos = obsPosArray[i];
+
       document.getElementById("main grid").innerHTML += `
-        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle${i}" class="game_obj">`
+        <img src="../assets/${obstacleIcon}" alt="obstacle" id="obstacle${i}" class="game_obj">`
       let obs = document.getElementById(`obstacle${i}`);
       _initObjectPosition(obs, pos);
     }
@@ -545,7 +549,6 @@
   function startCountdown(turnTime) {
     const bar = document.getElementById("turnBar");
     if (!bar) return;
-    console.log(turnTime)
     const total = turnTime
     var timeleft = turnTime;
 
@@ -613,22 +616,25 @@
   });
 
   // Add this APPEARANCE HANDLER after the server:updateTurns handler:
-// ✅ CORRECT - Add this in game.html after the server:updateTurns handler
-socket.on("appearance:update", (data) => {
-    console.log("Received appearance update:", data);
-    
-    // Update prisoner appearance
-    const prisoner = document.getElementById("prisoner");
-    if (prisoner) {
-        prisoner.src = `assets/${data.prisoner}`;
-    }
-    
-    // Update warder appearance  
-    const warder = document.getElementById("warder");
-    if (warder) {
-        warder.src = `assets/${data.warder}`;
-    }
-});
+  // ✅ CORRECT - Add this in game.html after the server:updateTurns handler
+  socket.on("appearance:update", (gameConfig) => {
+      console.log("Received appearance update:", gameConfig);
+      
+      // Update prisoner appearance
+      const prisoner = document.getElementById("prisoner");
+      if (prisoner) {
+          prisoner.src = `../assets/${gameConfig.prisonerIcon}`;
+      }
+      
+      // Update warder appearance  
+      const warder = document.getElementById("warder");
+      if (warder) {
+          warder.src = `../assets/${gameConfig.warderIcon}`;
+      }
+
+      // obstacle
+      obstacleIcon = gameConfig.obstacleIcon;
+  });
 
   socket.on("first player", (player) => {
     document.getElementById("player1-box").innerHTML += `

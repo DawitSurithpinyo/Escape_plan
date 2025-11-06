@@ -1,5 +1,6 @@
 # local git bundle backup
 *.bundle
+bundles/
 
 # debug
 npm-debug.*

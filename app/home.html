@@ -191,6 +191,18 @@
         <img src="assets/warder_icon.png" alt="Warder Preview" id="warder-preview" width="80">
       </div>
     </div>
+
+    <div class="appearance-option">
+      <label>Obstacle Style:</label>
+      <select id="obstacle-image">
+        <option value="obstacle_icon.png">Default Obstacle</option>
+        <option value="obstacle1.png">Obstacle 1</option>
+        <option value="obstacle2.png">Obstacle 2</option>
+      </select>
+      <div class="preview">
+        <img src="assets/obstacle_icon.png" alt="Obstacle Preview" id="obstacle-preview" width="80">
+      </div>
+    </div>
   </div>
 </div>
         <button id="gamebutton" class="button">Play</button>
@@ -393,9 +405,17 @@
       });
 
       // when first arriving on home page, load last configured settings
-      socket.on("receive config", ({ obstacle, speed }) => {
-        document.getElementById("obstacle").innerText = obstacle;
+      socket.on("receive config", ({ obstacleAmount, speed, warder, prisoner, obstacle }) => {
+        document.getElementById("obstacle").innerText = obstacleAmount;
         document.getElementById("game-speed").innerText = speed;
+        
+        warderSelect.value = warder;
+        prisonerSelect.value = prisoner;
+        obstacleSelect.value = obstacle;
+
+        warderPreview.src = `../assets/${warder}`;
+        prisonerPreview.src = `../assets/${prisoner}`;
+        obstaclePreview.src = `../assets/${obstacle}`;
       });
 
 
@@ -439,38 +459,63 @@
       });
 
       // Appearance selection - both players see the same
-const prisonerSelect = document.getElementById('prisoner-image');
-const warderSelect = document.getElementById('warder-image');
-const prisonerPreview = document.getElementById('prisoner-preview');
-const warderPreview = document.getElementById('warder-preview');
+      const prisonerSelect = document.getElementById('prisoner-image');
+      const warderSelect = document.getElementById('warder-image');
+      const obstacleSelect = document.getElementById('obstacle-image')
+      const prisonerPreview = document.getElementById('prisoner-preview');
+      const warderPreview = document.getElementById('warder-preview');
+      const obstaclePreview = document.getElementById('obstacle-preview');
 
-// Update preview images when selection changes
-prisonerSelect.addEventListener('change', function() {
-    prisonerPreview.src = `assets/${this.value}`;
-    // Emit to server so both players see the same
-    socket.emit('appearance:update', {
-        prisoner: prisonerSelect.value,
-        warder: warderSelect.value
-    });
-});
+      // Update preview images when selection changes
+      prisonerSelect.addEventListener('change', function() {
+          prisonerPreview.src = `../assets/${this.value}`;
+          // Emit to server so both players see the same
+          socket.emit('appearance:update', {
+              prisoner: prisonerPreview.src,
+              warder: warderPreview.src,
+              obstacle: obstaclePreview.src
+          });
+      });
 
-warderSelect.addEventListener('change', function() {
-    warderPreview.src = `assets/${this.value}`;
-    // Emit to server so both players see the same
-    socket.emit('appearance:update', {
-        prisoner: prisonerSelect.value,
-        warder: warderSelect.value
-    });
-});
+      warderSelect.addEventListener('change', function() {
+          warderPreview.src = `../assets/${this.value}`;
+          // Emit to server so both players see the same
+          socket.emit('appearance:update', {
+              prisoner: prisonerPreview.src,
+              warder: warderPreview.src,
+              obstacle: obstaclePreview.src
+          });
+      });
 
-// Send initial appearance when page loads
-window.addEventListener('DOMContentLoaded', () => {
-    // Emit default appearance
-    socket.emit('appearance:update', {
-        prisoner: prisonerSelect.value,
-        warder: warderSelect.value
-    });
-});
+      obstacleSelect.addEventListener('change', function() {
+        obstaclePreview.src = `../assets/${this.value}`;
+        // Emit to server so both players see the same
+        socket.emit('appearance:update', {
+          prisoner: prisonerPreview.src,
+          warder: warderPreview.src,
+          obstacle: obstaclePreview.src
+        });
+      });
+      
+
+      socket.on("receive icons", ({warder, prisoner, obstacle}) => {
+        warderSelect.value = warder;
+        prisonerSelect.value = prisoner;
+        obstacleSelect.value = obstacle;
+
+        warderPreview.src = `../assets/${warder}`;
+        prisonerPreview.src = `../assets/${prisoner}`;
+        obstaclePreview.src = `../assets/${obstacle}`;
+      })
+
+      // // Send initial appearance when page loads
+      // window.addEventListener('DOMContentLoaded', () => {
+      //     // Emit default appearance
+      //     socket.emit('appearance:update', {
+      //         prisoner: prisonerSelect.value,
+      //         warder: warderSelect.value
+      //     });
+      // });
     </script>
   </body>
 </html>
