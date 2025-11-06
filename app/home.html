@@ -157,7 +157,7 @@
         <form id="form1" action="">
           <input id="name" autocomplete="off" /><button>Confirm</button>
         </form>
-        <p>turn duration: <span id="game speed">10</span></p>
+        <p>Turn duration: <span id="game speed">10</span></p>
         <form id="form2" action="">
           <input id="gameSpeed" autocomplete="off" /><button>Confirm</button>
         </form>
@@ -333,19 +333,20 @@
       form2.addEventListener("submit", (e) => {
         e.preventDefault();
         const speed = parseFloat(gameSpeed.value.trim());
-        if (!isNaN(speed) || !(speed < 1) || !(speed > 10)) {
-          socket.emit("game:setSpeed", speed);
-          document.getElementById("game speed").innerText = speed;
-          gameSpeed.value = "";
+        if(isNaN(speed) || !Number.isInteger(speed) || speed < 1 || speed > 10) {
+          return;
         }
+        socket.emit("game:setSpeed", speed);
+        document.getElementById("game speed").innerText = speed;
+        gameSpeed.value = "";
       });
 
 
 
       form3.addEventListener("submit", (e) => {
         e.preventDefault();
-        const count = parseInt(obstacleCount.value.trim());
-        if(isNaN(count) || count < 0 || count > 5){
+        const count = parseFloat(obstacleCount.value.trim());
+        if(isNaN(count) || !Number.isInteger(count) || count < 0 || count > 5){
           return;
         }
         socket.emit("set obstacle", { count });
