@@ -157,7 +157,7 @@
         <form id="form1" action="">
           <input id="name" autocomplete="off" /><button>Confirm</button>
         </form>
-        <p>Turn duration: <span id="game speed">10</span></p>
+        <p>Turn duration: <span id="game-speed">10</span></p>
         <form id="form2" action="">
           <input id="gameSpeed" autocomplete="off" /><button>Confirm</button>
         </form>
@@ -365,7 +365,7 @@
           return;
         }
         socket.emit("game:setSpeed", speed);
-        document.getElementById("game speed").innerText = speed;
+        document.getElementById("game-speed").innerText = speed;
         gameSpeed.value = "";
       });
 
@@ -382,13 +382,20 @@
         obstacleCount.value = "";
       });
 
-      // when other player change obstacle count, or when first arriving on home page
+      // when other player change obstacle count
       socket.on("receive obstacle", ({ count }) => {
         document.getElementById("obstacle").innerText = count;
       });
 
+      // when other player change game speed
       socket.on("receive speed", ({ newSpeed }) => {
-        document.getElementById("game speed").innerText = newSpeed;
+        document.getElementById("game-speed").innerText = newSpeed;
+      });
+
+      // when first arriving on home page, load last configured settings
+      socket.on("receive config", ({ obstacle, speed }) => {
+        document.getElementById("obstacle").innerText = obstacle;
+        document.getElementById("game-speed").innerText = speed;
       });
 
 
@@ -414,11 +421,6 @@
         item.textContent = msg;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
-      });
-
-      socket.on("server:updateGameSpeed", ({ speed }) => {
-        const speedEl = document.getElementById("game speed");
-        if (speedEl) speedEl.textContent = speed;
       });
 
 

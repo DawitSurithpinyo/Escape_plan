@@ -32,5 +32,6 @@
   "bugs": {
     "url": "https://github.com/DawitSurithpinyo/Escape_plan/issues"
   },
-  "homepage": "https://github.com/DawitSurithpinyo/Escape_plan#readme"
+  "homepage": "https://github.com/DawitSurithpinyo/Escape_plan#readme",
+  "devDependencies": {}
 }

@@ -183,6 +183,15 @@
       height:20%;
     }
 
+    .bottombox{
+      height: 10%;
+      margin: 20px;
+      border: 5px solid var(--border-color);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
     /* ==== CHAT INPUT BAR ==== */
       #gameform {
         background: var(--input-bg);
@@ -216,6 +225,31 @@
         color: white; width: 100%;
         border-radius: 8px; border: none;
         padding: 10px; margin-top: 10px;
+        font-size: 16px; cursor: pointer;
+      }
+
+      /* ==== BOTTOM BOX (game count + leave button) ==== */
+      .gamecount{
+        border: 1px solid var(--border-color);
+        text-align: center;
+        align-content: center;
+        height: 100%;
+        width: 50%;
+      }
+
+      .leaveBtnDiv{
+        border: 1px solid var(--border-color);
+        text-align: center;
+        align-content: center;
+        height: 100%;
+        width: 50%;
+      }
+
+      #leaveBtn{
+        background-color: rgb(237, 57, 57);
+        color: white; width: 50;
+        border-radius: 4px; border: none;
+        padding: 10px;
         font-size: 16px; cursor: pointer;
       }
 
@@ -327,15 +361,19 @@
         <div class="chatlist"><ul id="gamemessages"></ul></div>
         <div class="chatinput">
           <form id="gameform" action="">
-        <input id="gameinput" autocomplete="off" /><button>Send</button>
-      </form>
-    </div>
+            <input id="gameinput" autocomplete="off" /><button>Send</button>
+          </form>
+        </div>
       </div>
-      <!-- game counter -->
-<div class="game-counter">
-    <div>Game: <span id="current-game">0</span></div>
-    <div>Turn: <span id="current-turn">0</span></div>
-</div>
+      <div class="bottombox">
+        <div class="gamecount">
+          <div>Game: <span id="current-game">0</span></div>
+          <div>Turn: <span id="current-turn">0</span></div>
+        </div>
+        <div class="leaveBtnDiv">
+          <button id="leaveBtn">Leave</button>
+        </div>
+      </div>
 
 
     </div>
@@ -709,6 +747,14 @@ socket.on("appearance:update", (data) => {
 
         // window.scrollTo(0, document.body.scrollHeight);
       });
+
+
+  // leave game button
+  const leaveBtn = document.getElementById("leaveBtn");
+  leaveBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '/';
+  });
 </script>
 
 </html>
