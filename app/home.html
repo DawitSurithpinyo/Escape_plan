@@ -165,6 +165,34 @@
         <form id="form3" action="">
           <input id="ObstacleCount" autocomplete="off" /><button>Confirm</button>
         </form>
+        <div class="character-selection">
+  <p>Appearance</p>
+  <div class="appearance-options">
+    <div class="appearance-option">
+      <label>Prisoner Style:</label>
+      <select id="prisoner-image">
+        <option value="prisoner_icon.png">Default Prisoner</option>
+        <option value="prisoner1.png">Prisoner 1</option>
+        <option value="prisoner2.png">Prisoner 2</option>
+      </select>
+      <div class="preview">
+        <img src="assets/prisoner_icon.png" alt="Prisoner Preview" id="prisoner-preview" width="80">
+      </div>
+    </div>
+    
+    <div class="appearance-option">
+      <label>Warder Style:</label>
+      <select id="warder-image">
+        <option value="warder_icon.png">Default Warder</option>
+        <option value="warder1.png">Warder 1</option>
+        <option value="warder2.png">Warder 2</option>
+      </select>
+      <div class="preview">
+        <img src="assets/warder_icon.png" alt="Warder Preview" id="warder-preview" width="80">
+      </div>
+    </div>
+  </div>
+</div>
         <button id="gamebutton" class="button">Play</button>
       </div>
 
@@ -407,6 +435,40 @@
         const el = document.getElementById('player2');
         if (el) el.textContent = number;
       });
+
+      // Appearance selection - both players see the same
+const prisonerSelect = document.getElementById('prisoner-image');
+const warderSelect = document.getElementById('warder-image');
+const prisonerPreview = document.getElementById('prisoner-preview');
+const warderPreview = document.getElementById('warder-preview');
+
+// Update preview images when selection changes
+prisonerSelect.addEventListener('change', function() {
+    prisonerPreview.src = `assets/${this.value}`;
+    // Emit to server so both players see the same
+    socket.emit('appearance:update', {
+        prisoner: prisonerSelect.value,
+        warder: warderSelect.value
+    });
+});
+
+warderSelect.addEventListener('change', function() {
+    warderPreview.src = `assets/${this.value}`;
+    // Emit to server so both players see the same
+    socket.emit('appearance:update', {
+        prisoner: prisonerSelect.value,
+        warder: warderSelect.value
+    });
+});
+
+// Send initial appearance when page loads
+window.addEventListener('DOMContentLoaded', () => {
+    // Emit default appearance
+    socket.emit('appearance:update', {
+        prisoner: prisonerSelect.value,
+        warder: warderSelect.value
+    });
+});
     </script>
   </body>
 </html>

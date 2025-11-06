@@ -336,6 +336,20 @@
     <div>Game: <span id="current-game">0</span></div>
     <div>Turn: <span id="current-turn">0</span></div>
 </div>
+<!-- Add this after the game counter in the right sidebar -->
+<div class="appearance-display">
+    <h3>Current Appearance</h3>
+    <div class="current-appearances">
+        <div class="appearance-item">
+            <img src="../assets/prisoner_icon.png" alt="Prisoner" id="current-prisoner-display">
+            <div class="appearance-label">Prisoner</div>
+        </div>
+        <div class="appearance-item">
+            <img src="../assets/warder_icon.png" alt="Warder" id="current-warder-display">
+            <div class="appearance-label">Warder</div>
+        </div>
+    </div>
+</div>
 
     </div>
   </div>
@@ -564,7 +578,7 @@
     time = speed;
   });
 
-
+//-------------------------------------------------------------------------------------------------------------------------------------------
   socket.on('server:updateGames', function(data) {
     document.getElementById('current-game').textContent = data.totalGamesPlayed;
   });
@@ -572,6 +586,52 @@
   socket.on('server:updateTurns', function(data) {
     document.getElementById('current-turn').textContent = data.totalTurnsThisGame;
   });
+
+  // Add this APPEARANCE HANDLER after the server:updateTurns handler:
+socket.on("appearance:update", (data) => {
+    console.log("Received appearance update:", data);
+    
+    // Update prisoner appearance
+    const prisoner = document.getElementById("prisoner");
+    if (prisoner) {
+        prisoner.src = `../assets/${data.prisoner}`;
+    }
+    
+    // Update warder appearance  
+    const warder = document.getElementById("warder");
+    if (warder) {
+        warder.src = `../assets/${data.warder}`;
+    }
+});
+
+
+// Update your existing appearance handler in game.html:
+socket.on("appearance:update", (data) => {
+    console.log("Received appearance update:", data);
+    
+    // Update game character appearances
+    const prisoner = document.getElementById("prisoner");
+    if (prisoner) {
+        prisoner.src = `../assets/${data.prisoner}`;
+    }
+    
+    const warder = document.getElementById("warder");
+    if (warder) {
+        warder.src = `../assets/${data.warder}`;
+    }
+    
+    // Update display section
+    const prisonerDisplay = document.getElementById("current-prisoner-display");
+    const warderDisplay = document.getElementById("current-warder-display");
+    
+    if (prisonerDisplay) {
+        prisonerDisplay.src = `../assets/${data.prisoner}`;
+    }
+    if (warderDisplay) {
+        warderDisplay.src = `../assets/${data.warder}`;
+    }
+});
+  
 
   socket.on("first player", (player) => {
     document.getElementById("player1-box").innerHTML += `
