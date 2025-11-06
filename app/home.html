@@ -335,8 +335,6 @@
         if (!isNaN(speed)) {
           socket.emit("game:setSpeed", speed);
           gameSpeed.value = "";
-          const gameSocket = io("/game");
-          gameSocket.emit("server:updateGameSpeed", { speed });
         }
       });
 
