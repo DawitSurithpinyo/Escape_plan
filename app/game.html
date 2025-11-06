@@ -215,11 +215,11 @@
         <img src="../assets/warder_icon.png" alt="warder" id="warder" class="game_obj">
         <img src="../assets/prisoner_icon.png" alt="prisoner" id="prisoner" class="game_obj">
         <img src="../assets/tunnel_icon.png" alt="tunnel" id="tunnel" class="game_obj">
-        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle0" class="game_obj">
+        <!-- <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle0" class="game_obj">
         <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle1" class="game_obj">
         <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle2" class="game_obj">
         <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle3" class="game_obj">
-        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle4" class="game_obj">
+        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle4" class="game_obj"> -->
 
         <!-- grid -->
         <div class="grid-row" id="row 0">
@@ -328,14 +328,9 @@
 
   function gameStart(grid, obsPos, warderPos, prisonerPos, tunnelPos) {
     if (!grid && !obsPos && !warderPos && !prisonerPos && !tunnelPos) {
-      // generate random map
-      const result = gridInit();
-      grid = result.grid;
-      obsPos = result.obsPos;
-      warderPos = result.warderPos;
-      prisonerPos = result.prisonerPos;
-      tunnelPos = result.tunnelPos;
-      
+      // supposed to receive grid from server
+      console.log("Error: No grid data from server");
+      return;
     }
     //console.log(`Hello, is this ${result}`);
     display_grid(grid);
@@ -351,6 +346,8 @@
     // put objects to their starting position
     for (let i = 0; i < obsPosArray.length; i++) {
       let pos = obsPosArray[i];
+      document.getElementById("main grid").innerHTML += `
+        <img src="../assets/obstacle_icon.png" alt="obstacle" id="obstacle${i}" class="game_obj">`
       let obs = document.getElementById(`obstacle${i}`);
       _initObjectPosition(obs, pos);
     }
