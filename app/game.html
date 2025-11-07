@@ -365,6 +365,13 @@
           </form>
         </div>
       </div>
+      <!-- Arrow Buttons -->
+      <div id="arrows" style="text-align:center; margin-top:20px;">
+        <button data-key="ArrowUp">⬆️</button><br>
+        <button data-key="ArrowLeft">⬅️</button>
+        <button data-key="ArrowDown">⬇️</button>
+        <button data-key="ArrowRight">➡️</button>
+      </div>
       <div class="bottombox">
         <div class="gamecount">
           <div>Game: <span id="current-game">0</span></div>
@@ -760,6 +767,10 @@
   leaveBtn.addEventListener('click', (e) => {
     e.preventDefault();
     window.location.href = '/';
+  });
+
+    document.querySelectorAll('#arrows button').forEach(b=>{
+    b.onclick=()=>document.dispatchEvent(new KeyboardEvent('keydown',{key:b.dataset.key}));
   });
 </script>
 

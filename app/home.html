@@ -140,6 +140,57 @@
         background: var(--accent-color);
         color: white;
       }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 10;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8); /* Darker overlay */
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        position: relative;
+        width: 60%; /* Or adjust width */
+        max-width: 800px;
+        height: 80%; /* Adjust height */
+        background: transparent;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        padding: 0;
+        border-radius: 8px;
+      }
+
+      .modal-content img {
+        width: 110%;          /* Image should take the full width */
+        height: 100%;         /* Image should take the full height */
+        object-fit: cover;    /* Ensures the image fully covers the div area without distortion */
+        border-radius: 8px;
+      }
+
+      .close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: white;
+        font-size: 32px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 11;
+      }
+
+      .close:hover {
+        color: #ccc;
+      }
+
+      .howToPlayBtnDiv {
+        text-align: center;
+        margin-top: 50px;
+      }
     </style>
   </head>
 
@@ -202,6 +253,16 @@
       <div class="preview">
         <img src="assets/obstacle_icon.png" alt="Obstacle Preview" id="obstacle-preview" width="80">
       </div>
+    </div>
+  </div>
+
+  <div class="howToPlayBtnDiv">
+    <button id="howToPlayBtn">How to Play</button>
+  </div>
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <img src="../assets/tutorial.jpg" alt="Tutorial" width="1000" height="900">
     </div>
   </div>
 </div>
@@ -516,6 +577,23 @@
       //         warder: warderSelect.value
       //     });
       // });
+const modal = document.getElementById("myModal");
+const howToPlayBtn = document.getElementById("howToPlayBtn");
+const closeBtn = document.querySelector(".close");
+
+howToPlayBtn.addEventListener("click", () => {
+  modal.style.display = "flex"; // Use flex to center the modal
+});
+
+closeBtn.addEventListener("click", () => {
+  modal.style.display = "none";
+});
+
+window.addEventListener("click", (event) => {
+  if (event.target === modal) {
+    modal.style.display = "none";
+  }
+});
     </script>
   </body>
 </html>
