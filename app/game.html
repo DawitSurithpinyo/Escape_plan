@@ -737,12 +737,12 @@
   form.addEventListener('submit', (e) => {
         e.preventDefault();
         if (input.value) {
-          socket.emit('chat message', input.value);
+          socket.emit('game chat message', input.value);
           input.value = '';
         }
       });
 
-  socket.on('chat message', (msg) => {
+  socket.on('game chat message', (msg) => {
         const item = document.createElement('li');
         console.log("message is "+ msg)
         item.textContent = msg;
